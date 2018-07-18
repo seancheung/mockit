@@ -1,0 +1,37 @@
+{
+    "name": "mockit",
+    "version": "0.1.0",
+    "description": "Http API mock for frontend development",
+    "main": "index.js",
+    "scripts": {
+        "test": "mocha test",
+        "start": "node ./src/server.js"
+    },
+    "bin": {
+        "mockit": "cli"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+ssh://git@github.com/seancheung/mockit.git"
+    },
+    "keywords": [
+        "http",
+        "mock",
+        "fake",
+        "rest"
+    ],
+    "author": "seancheung <theoxuanx@gmail.com> (https://seanz.me)",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/seancheung/mockit/issues"
+    },
+    "homepage": "https://github.com/seancheung/mockit#readme",
+    "dependencies": {
+        "body-parser": "^1.18.3",
+        "express": "^4.16.3",
+        "js-yaml": "^3.12.0",
+        "lokijs": "^1.5.5",
+        "morgan": "^1.9.0",
+        "yargs-parser": "^10.1.0"
+    }
+}

@@ -1,0 +1,12 @@
+{
+    "app": {
+        "host": "localhost",
+        "port": 9000
+    },
+    "db": {
+        "file": "store.db",
+        "autoload": true,
+        "autosave": true,
+        "autosaveInterval": 5000
+    }
+}
