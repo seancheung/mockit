@@ -1,19 +1,23 @@
+const path = require('path');
 const crypto = require('crypto');
 const express = require('express');
+const webpack = require('webpack');
+const middleware = require('webpack-dev-middleware');
 const boot = require('./boot');
 const db = require('./db');
 const routes = require('./routes');
+const options = require('../client/webpack.config');
 
 const router = express.Router({ mergeParams: true });
+const compiler = webpack(options);
 
-router.get('/', (req, res, next) => {
-    try {
-        //TODO: view
-        res.send('hello');
-    } catch (error) {
-        next(error);
-    }
-});
+router.use(
+    middleware(compiler, {
+        publicPath: '/',
+        logLevel: 'error'
+    })
+);
+router.use(express.static(path.resolve(__dirname, '../client/public')));
 
 router.get('/routes', (req, res, next) => {
     try {

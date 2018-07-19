@@ -15,7 +15,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(morgan('combined'));
 
-app.use('/_', dashboard);
+app.use(dashboard);
 app.use(routes);
 
 app.use((req, res, next) => {
