@@ -31,5 +31,11 @@ module.exports = {
             }
         ]
     },
-    resolve: { extensions: ['.js', '.jsx'] }
+    resolve: {
+        extensions: ['.js', '.jsx'],
+        modules: [path.join(__dirname, '../node_modules')]
+    },
+    resolveLoader: {
+        modules: [path.join(__dirname, '../node_modules')]
+    }
 };
