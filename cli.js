@@ -17,6 +17,22 @@ default:
     break;
 }
 
+function prepare(config, cb) {
+    if (config.app.port) {
+        cb();
+    } else {
+        require('./src/allocate')(8080, config.app.host, (err, port) => {
+            if (err) {
+                console.error(err);
+                process.exit(1);
+            } else {
+                config.app.port = port;
+                cb();
+            }
+        });
+    }
+}
+
 function start() {
     const opts = {
         alias: {
@@ -43,7 +59,7 @@ function start() {
     if (!path.isAbsolute(config.db.file)) {
         config.db.file = path.resolve(config.__dirname, config.db.file);
     }
-    require('./src/server');
+    prepare(config, () => require('./src/server'));
 }
 
 function help() {

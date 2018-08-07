@@ -1,7 +1,7 @@
 {
     "app": {
-        "host": "localhost",
-        "port": 9000
+        "host": "0.0.0.0",
+        "port": null
     },
     "db": {
         "file": "store.db",
