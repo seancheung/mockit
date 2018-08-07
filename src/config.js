@@ -34,7 +34,7 @@ if (process.env.NODE_ENV !== 'production') {
     config.__dirname = path.basename(filepath);
 }
 
-if (!path.isAbsolute(config.db.file)) {
+if (config.db.file && !path.isAbsolute(config.db.file)) {
     config.db.file = path.resolve(config.__dirname, config.db.file);
 }
 
