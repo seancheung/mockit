@@ -42,6 +42,7 @@
         "no-useless-constructor": ["error"],
         "no-var": ["error"],
         "prefer-const": ["error"],
-        "prefer-rest-params": ["error"]
+        "prefer-rest-params": ["error"],
+        "react/prop-types": ["warn", { "ignore": ["classes"] }]
     }
 }

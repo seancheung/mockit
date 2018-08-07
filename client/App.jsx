@@ -3,6 +3,7 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import 'typeface-roboto';
+import Route from './Route';
 
 export default class App extends React.Component {
 
@@ -16,6 +17,13 @@ export default class App extends React.Component {
                         </Typography>
                     </Toolbar>
                 </AppBar>
+                <div>
+                    <Route />
+                    <Route />
+                    <Route />
+                    <Route />
+                    <Route />
+                </div>
             </div>
         );
     }

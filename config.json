@@ -1,7 +1,7 @@
 {
     "app": {
         "host": "0.0.0.0",
-        "port": null
+        "port": 0
     },
     "db": {
         "file": null,
