@@ -8,7 +8,9 @@ function allocate(port, host, cb, max) {
         server.close();
     });
     server.on('error', err => {
-        if (max && port >= max) {
+        if (err.code !== 'EADDRINUSE') {
+            cb(err);
+        } else if (max && port >= max) {
             cb(err);
         } else {
             allocate(port + 1, host, cb, max);
