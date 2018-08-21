@@ -37,7 +37,7 @@ function start() {
         },
         string: ['host', 'db', 'cert', 'key', 'format'],
         number: ['port'],
-        boolean: ['ssl', 'cors', 'silent', 'open']
+        boolean: ['ssl', 'cors', 'http2', 'silent', 'open']
     };
     const argv = require('yargs-parser')(args, opts);
     const config = require('./config.json');
@@ -55,6 +55,9 @@ function start() {
         config.ssl.enabled = true;
         config.ssl.cert = argv.cert;
         config.ssl.key = argv.key;
+    }
+    if (argv.http2) {
+        config.app.http2 = true;
     }
     if (argv.silent) {
         config.logger.enabled = false;
@@ -123,10 +126,11 @@ function help() {
     console.log('   -D, --db=<path>     database file path');
     console.log('   -S, --ssl           enable https');
     console.log('   -X, --cors          enable CORS');
+    console.log('       --http2         enable http2');
     console.log('   -C, --cert[=path]   ssl cert file path');
     console.log('   -K, --key[=path]    ssl key file path');
     console.log('   -O, --open          open browser');
-    console.log('   --silent            no request log');
+    console.log('       --silent        no request log');
     console.log(
         '   --format=<type>     request log format(combined|common|short|tiny|dev)'
     );

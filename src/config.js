@@ -37,5 +37,11 @@ if (process.env.NODE_ENV !== 'production') {
 if (config.db.file && !path.isAbsolute(config.db.file)) {
     config.db.file = path.resolve(config.__dirname, config.db.file);
 }
+if (config.ssl.cert && !path.isAbsolute(config.ssl.cert)) {
+    config.ssl.cert = path.resolve(config.__dirname, config.ssl.cert);
+}
+if (config.ssl.key && !path.isAbsolute(config.ssl.key)) {
+    config.ssl.key = path.resolve(config.__dirname, config.ssl.key);
+}
 
 module.exports = config;

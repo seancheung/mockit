@@ -1,9 +1,24 @@
 /*eslint no-console: off*/
-const http = require('http');
 const config = require('./config');
 const app = require('./app');
 
-const server = http.createServer(app);
+let server;
+if (config.ssl.enabled) {
+    const fs = require('fs');
+    const opts = {
+        cert: fs.readFileSync(config.ssl.cert, 'utf8'),
+        key: fs.readFileSync(config.ssl.key, 'utf8')
+    };
+    if (config.app.http2) {
+        server = require('http2').createSecureServer(opts, app);
+    } else {
+        server = require('https').createServer(opts, app);
+    }
+} else if (config.app.http2) {
+    server = require('http2').createServer(app);
+} else {
+    server = require('http').createServer(app);
+}
 
 server.on('error', err => {
     if (err.syscall !== 'listen') {
