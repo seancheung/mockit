@@ -32,37 +32,6 @@ server.on('error', err => {
     }
 });
 
-server.on('listening', () => {
-    const addr = server.address();
-    console.info(
-        '\x1b[33m%s\x1b[0m',
-        `Listening on ${addr.address} port ${addr.port}`
-    );
-    const os = require('os');
-    const interfaces = os.networkInterfaces();
-    const hosts = [];
-    Object.values(interfaces).forEach(infos =>
-        infos.forEach(info => {
-            if (info.family === 'IPv4') {
-                if (/^127\./.test(info.address)) {
-                    hosts.push(info.address);
-                } else if (/^0\./.test(addr.address)) {
-                    hosts.push(info.address);
-                } else {
-                    const p1 = addr.address.split('.');
-                    const p2 = info.address.split('.');
-                    if (p1[0] === p2[0] && p1[1] === p2[1]) {
-                        hosts.push(info.address);
-                    }
-                }
-            }
-        })
-    );
-    hosts.forEach(host =>
-        console.info('\x1b[32m%s\x1b[0m', `http://${host}:${addr.port}`)
-    );
-});
-
 server.listen(config.app.port, config.app.host);
 app.set('port', config.app.port);
 app.set('host', config.app.host);

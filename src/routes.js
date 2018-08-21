@@ -1,18 +1,25 @@
 const express = require('express');
 const boot = require('./boot');
+const db = require('./db');
+const config = require('./config');
 
 const router = express.Router({ mergeParams: true });
 
-router.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header(
-        'Access-Control-Allow-Headers',
-        'Origin, X-Requested-With, Content-Type, Accept'
-    );
-    next();
-});
+if (config.logger.enabled) {
+    router.use(require('morgan')(config.logger.type));
+}
 
-const db = require('./db');
+if (config.app.cors) {
+    router.use((req, res, next) => {
+        res.header('Access-Control-Allow-Origin', '*');
+        res.header(
+            'Access-Control-Allow-Headers',
+            'Origin, X-Requested-With, Content-Type, Accept'
+        );
+        next();
+    });
+}
+
 db.on('ready', () => {
     const routes = db
         .getCollection('routes')

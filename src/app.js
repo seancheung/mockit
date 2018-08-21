@@ -3,7 +3,6 @@
 
 const express = require('express');
 const bodyParser = require('body-parser');
-const morgan = require('morgan');
 const dashboard = require('./dashboard');
 const routes = require('./routes');
 const graphql = require('./graphql');
@@ -13,8 +12,6 @@ app.set('trust proxy', true);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-
-app.use(morgan('combined'));
 
 app.use(graphql);
 app.use(dashboard);
