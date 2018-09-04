@@ -127,8 +127,8 @@ function help() {
     console.log('   -S, --ssl           enable https');
     console.log('   -X, --cors          enable CORS');
     console.log('       --http2         enable http2');
-    console.log('   -C, --cert[=path]   ssl cert file path');
-    console.log('   -K, --key[=path]    ssl key file path');
+    console.log('   -C, --cert=<path>   ssl cert file path');
+    console.log('   -K, --key=<path>    ssl key file path');
     console.log('   -O, --open          open browser');
     console.log('       --silent        no request log');
     console.log(

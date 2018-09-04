@@ -4,6 +4,7 @@ const express = require('express');
 const webpack = require('webpack');
 const middleware = require('webpack-dev-middleware');
 const boot = require('./boot');
+const strip = require('./strip');
 const db = require('./db');
 const routes = require('./routes');
 const options = require('../client/webpack.config');
@@ -34,7 +35,7 @@ router.get('/routes', (req, res, next) => {
 
 router.post('/routes', (req, res, next) => {
     try {
-        const { method, path, delay, code, headers, body } = req.body;
+        const { method, path, delay, code, headers, body, bypass } = req.body;
         if (!method || !path) {
             const error = new Error('missing required arguments');
             error.status = 400;
@@ -49,17 +50,20 @@ router.post('/routes', (req, res, next) => {
             path,
             method: method.toLowerCase()
         };
-        if (delay) {
+        if (delay != undefined) {
             data.delay = delay;
         }
-        if (code) {
+        if (code != undefined) {
             data.code = code;
         }
-        if (headers) {
+        if (headers != undefined) {
             data.headers = headers;
         }
-        if (body) {
+        if (body != undefined) {
             data.body = body;
+        }
+        if (bypass != undefined) {
+            data.bypass = bypass;
         }
         const doc = db.getCollection('routes').insert(data);
         boot(routes, [doc]);
@@ -83,6 +87,40 @@ router.get('/routes/:id', (req, res, next) => {
     }
 });
 
+router.put('/routes/:id', (req, res, next) => {
+    try {
+        const col = db.getCollection('routes');
+        const doc = col.by('id', req.params.id);
+        if (!doc) {
+            const error = new Error('not found');
+            error.status = 404;
+            throw error;
+        }
+        const { delay, code, headers, body, bypass } = req.body;
+        if (delay != undefined) {
+            doc.delay = delay;
+        }
+        if (code != undefined) {
+            doc.code = code;
+        }
+        if (headers != undefined) {
+            doc.headers = headers;
+        }
+        if (body != undefined) {
+            doc.body = body;
+        }
+        if (bypass != undefined) {
+            doc.bypass = bypass;
+        }
+        col.update(doc);
+        strip(routes, doc);
+        boot(routes, [doc]);
+        res.json(doc);
+    } catch (error) {
+        next(error);
+    }
+});
+
 router.delete('/routes/:id', (req, res, next) => {
     try {
         const col = db.getCollection('routes');
@@ -93,16 +131,8 @@ router.delete('/routes/:id', (req, res, next) => {
             throw error;
         }
         col.remove(doc);
-        const index = routes.stack.findIndex(
-            layer =>
-                layer.route &&
-                layer.route.path === doc.path &&
-                layer.route.methods[doc.method] === true
-        );
-        if (index >= 0) {
-            routes.stack.splice(index, 1);
-        }
-        res.json(doc);
+        strip(routes, doc);
+        res.status(204).end();
     } catch (error) {
         next(error);
     }
