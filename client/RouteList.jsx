@@ -1,7 +1,8 @@
 import React from 'react';
-import Route from './Route';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import Route from './Route';
+import { list } from './store/commands';
 
 class RouteList extends React.Component {
 
@@ -15,11 +16,17 @@ class RouteList extends React.Component {
         );
     }
 
+    componentDidMount() {
+        this.props.list(0, 10);
+    }
+
     static get propTypes() {
         return {
+            list: PropTypes.func,
             routes: PropTypes.arrayOf(
                 PropTypes.shape({
-                    name: PropTypes.string.isRequired,
+                    method: PropTypes.string.isRequired,
+                    path: PropTypes.string.isRequired,
                     code: PropTypes.number,
                     headers: PropTypes.object,
                     body: PropTypes.string,
@@ -31,4 +38,11 @@ class RouteList extends React.Component {
 
 }
 
-export default connect(state => ({ routes: state.routes }))(RouteList);
+export default connect(
+    state => ({ routes: state.routes }),
+    dispatch => ({
+        list: (index, size) => {
+            dispatch(list(index, size));
+        }
+    })
+)(RouteList);

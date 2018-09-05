@@ -39,7 +39,8 @@ class RouteView extends React.Component {
 
     static get propTypes() {
         return {
-            name: PropTypes.string.isRequired,
+            method: PropTypes.string.isRequired,
+            path: PropTypes.string.isRequired,
             code: PropTypes.number,
             headers: PropTypes.object,
             body: PropTypes.string,

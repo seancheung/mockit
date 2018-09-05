@@ -34,7 +34,9 @@ class Route extends React.Component {
         return (
             <ExpansionPanel className={this.props.classes.root}>
                 <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography variant="button">{this.props.name}</Typography>
+                    <Typography variant="button">{`${this.props.method.toUpperCase()} ${
+                        this.props.path
+                    }`}</Typography>
                 </ExpansionPanelSummary>
                 <ExpansionPanelDetails className={this.props.classes.details}>
                     {this.state.edit ? (
@@ -87,7 +89,8 @@ class Route extends React.Component {
 
     getProps() {
         return {
-            name: this.props.name,
+            method: this.props.method,
+            path: this.props.path,
             code: this.props.code,
             headers: this.props.headers,
             body: this.props.body,
@@ -109,7 +112,8 @@ class Route extends React.Component {
 
     static get propTypes() {
         return {
-            name: PropTypes.string.isRequired,
+            method: PropTypes.string.isRequired,
+            path: PropTypes.string.isRequired,
             code: PropTypes.number,
             headers: PropTypes.object,
             body: PropTypes.string,

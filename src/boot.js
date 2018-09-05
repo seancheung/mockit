@@ -4,6 +4,9 @@ module.exports = config => {
         logger.log = () => {};
     }
     const options = require('../client/webpack.config');
+    if (config.dashboard.path) {
+        options.output.publicPath = config.dashboard.path + '/';
+    }
     const db = require('./db');
     if (config.router.routes) {
         db.load(config.router.routes);
