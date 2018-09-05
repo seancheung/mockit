@@ -4,9 +4,26 @@ const webpack = require('webpack');
 const middleware = require('webpack-dev-middleware');
 const routing = require('./routing');
 
-module.exports = (config, db, router, options) => {
+module.exports = (app, config, db, router, options) => {
+    let baseUrl;
+    if (config.baseUrl) {
+        baseUrl = (config.baseUrl + '/').replace(/\/{2,}/g, '/');
+    } else {
+        baseUrl = '/';
+    }
     const dashboard = express.Router({ mergeParams: true });
-    const compiler = webpack(options);
+    const compiler = webpack(
+        Object.assign({}, options, {
+            output: Object.assign({}, options.output, {
+                publicPath: baseUrl
+            }),
+            plugins: [
+                new webpack.DefinePlugin({
+                    BASE_URL: JSON.stringify(baseUrl.replace(/\/$/, '')) || '/'
+                })
+            ]
+        })
+    );
 
     dashboard.use(
         middleware(compiler, {
@@ -164,6 +181,12 @@ module.exports = (config, db, router, options) => {
             next(error);
         }
     });
+
+    if (config.baseUrl) {
+        app.use(config.baseUrl, dashboard);
+    } else {
+        app.use(dashboard);
+    }
 
     return dashboard;
 };

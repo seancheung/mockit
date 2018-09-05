@@ -1,7 +1,7 @@
 const express = require('express');
 const routing = require('./routing');
 
-module.exports = (config, db) => {
+module.exports = (app, config, db) => {
     const router = express.Router({ mergeParams: true });
 
     if (config.logger && config.logger.enabled) {
@@ -20,6 +20,8 @@ module.exports = (config, db) => {
     }
 
     routing.mount(router, ...db.all());
+
+    app.use(router);
 
     return router;
 };

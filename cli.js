@@ -150,7 +150,7 @@ function start() {
                     })
                 );
             }
-            const dashboard = (config.dashboard && config.dashboard.path) || '';
+            const dashboard = (config.dashboard && config.dashboard.baseUrl) || '';
             console.log(
                 '\x1b[36m%s\x1b[0m',
                 `Dashboard:\n${protocol}://${host}:${port}${dashboard}`

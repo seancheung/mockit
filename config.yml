@@ -7,7 +7,7 @@ ssl:
   key: '/path/to/key/file'
 debug: true
 dashboard:
-  path: '/dashboard'
+  baseUrl: '/'
   logger:
     enabled: true
     type: 'combined'

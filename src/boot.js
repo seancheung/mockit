@@ -4,24 +4,14 @@ module.exports = config => {
         logger.log = () => {};
     }
     const options = require('../client/webpack.config');
-    if (config.dashboard.path) {
-        options.output.publicPath = config.dashboard.path + '/';
-    }
     const db = require('./db');
     if (config.router.routes) {
         db.load(config.router.routes);
     }
-    const router = require('./router')(config.router, db);
-    const dashboard = require('./dashboard')(
-        config.dashboard,
-        db,
-        router,
-        options
-    );
-    const app = require('./app')(
-        { path: config.dashboard.path, router: dashboard },
-        { router }
-    );
+    const app = require('./app');
+    const router = require('./router')(app, config.router, db);
+    require('./dashboard')(app, config.dashboard, db, router, options);
+    require('./handler')(app);
 
     let server;
     if (config.ssl && config.ssl.enabled) {
