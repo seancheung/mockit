@@ -2,9 +2,8 @@ const path = require('path');
 const express = require('express');
 const webpack = require('webpack');
 const middleware = require('webpack-dev-middleware');
-const routing = require('./routing');
 
-module.exports = (app, config, db, router, options) => {
+module.exports = (app, config, db, target, options) => {
     let baseUrl;
     if (config.baseUrl) {
         baseUrl = (config.baseUrl + '/').replace(/\/{2,}/g, '/');
@@ -83,7 +82,7 @@ module.exports = (app, config, db, router, options) => {
                 error.status = 500;
                 throw error;
             }
-            routing.mount(router, doc);
+            target.reload();
             res.status(201).end();
         } catch (error) {
             next(error);
@@ -134,7 +133,7 @@ module.exports = (app, config, db, router, options) => {
                 error.status = 500;
                 throw error;
             }
-            routing.remount(router, doc);
+            target.reload();
             res.json(doc);
         } catch (error) {
             next(error);
@@ -154,7 +153,7 @@ module.exports = (app, config, db, router, options) => {
                 error.status = 500;
                 throw error;
             }
-            routing.unmount(router, doc);
+            target.reload();
             res.status(204).end();
         } catch (error) {
             next(error);

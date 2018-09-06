@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import Route from './Route';
 import dispatcher from './store/dispatcher';
 import { withStyles } from '@material-ui/core/styles';
+import RouteDelete from './RouteDelete';
 
 const styles = theme => ({
     content: {
@@ -16,6 +17,11 @@ const styles = theme => ({
 
 class RouteList extends React.Component {
 
+    constructor(props) {
+        super(props);
+        this.state = { selected: null };
+    }
+
     render() {
         return (
             <div className={this.props.classes.content}>
@@ -24,11 +30,16 @@ class RouteList extends React.Component {
                     <Route
                         key={index}
                         data={data}
-                        removeHandler={this.props.removeRoute.bind(this, index)}
+                        removeHandler={() => this.setState({ selected: index })}
                         updateHandler={this.props.updateRoute.bind(this, index)}
                         editHandler={this.props.editRoute.bind(this, index)}
                     />
                 ))}
+                <RouteDelete
+                    open={this.state.selected != null}
+                    closeHandler={() => this.setState({ selected: null })}
+                    deleteHandler={this.handleDelete.bind(this)}
+                />
             </div>
         );
     }
@@ -36,6 +47,11 @@ class RouteList extends React.Component {
     componentDidMount() {
         this.props.getTemplate();
         this.props.listRoutes(this.props.app.index, this.props.app.size);
+    }
+
+    handleDelete() {
+        this.props.removeRoute(this.state.selected);
+        this.setState({ selected: null });
     }
 
 }

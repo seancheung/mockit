@@ -51,7 +51,7 @@ class Route extends React.Component {
                     {this.props.data.edit ? (
                         <RouteEdit
                             {...this.props.data}
-                            stateChangedHandler={this.onEdit.bind(this)}
+                            stateChangedHandler={this.handleEdit.bind(this)}
                         />
                     ) : (
                         <RouteView {...this.props.data} />
@@ -72,7 +72,7 @@ class Route extends React.Component {
                                     mini
                                     color="primary"
                                     aria-label="Complete"
-                                    onClick={this.update.bind(this)}
+                                    onClick={this.handleUpdate.bind(this)}
                                 >
                                     <CheckIcon />
                                 </Button>
@@ -141,11 +141,11 @@ class Route extends React.Component {
         );
     }
 
-    onEdit(changed) {
+    handleEdit(changed) {
         this.setState(changed);
     }
 
-    update() {
+    handleUpdate() {
         this.props.updateHandler(this.state);
     }
 

@@ -27,9 +27,11 @@ class RouteCreate extends React.Component {
             <Dialog
                 open={this.props.open}
                 onClose={this.props.closeHandler}
-                aria-labelledby="form-dialog-title"
+                aria-labelledby="create-dialog-title"
             >
-                <DialogTitle id="form-dialog-title">Add New Route</DialogTitle>
+                <DialogTitle id="create-dialog-title">
+                    Add New Route
+                </DialogTitle>
                 <DialogContent>
                     <DialogContentText>
                         Please choose the <b>METHOD</b> and set the <b>PATH</b>{' '}
