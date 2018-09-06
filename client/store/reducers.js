@@ -30,12 +30,22 @@ export function routes(state = [], action) {
     case ACTIONS.REMOVE:
         return state.filter((_, i) => i !== action.index);
     case ACTIONS.UPDATE:
-        return state.map((route, i) => {
+        return state.map((data, i) => {
             if (action.index === i) {
-                return Object.assign({}, route, action.data);
+                return Object.assign({}, data, action.data, {
+                    edit: false
+                });
             }
 
-            return route;
+            return data;
+        });
+    case ACTIONS.EDIT:
+        return state.map((data, i) => {
+            if (action.index === i) {
+                return Object.assign({}, data, { edit: action.enabled });
+            }
+
+            return data;
         });
     case ACTIONS.EXPORT:
         // TODO:

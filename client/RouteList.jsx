@@ -15,6 +15,7 @@ class RouteList extends React.Component {
                         data={data}
                         removeHandler={this.props.remove.bind(this, index)}
                         updateHandler={this.props.update.bind(this, index)}
+                        editHandler={this.props.edit.bind(this, index)}
                     />
                 ))}
             </div>
@@ -38,6 +39,7 @@ class RouteList extends React.Component {
             list: PropTypes.func,
             insert: PropTypes.func,
             remove: PropTypes.func,
+            edit: PropTypes.func,
             update: PropTypes.func,
             dump: PropTypes.func,
             load: PropTypes.func

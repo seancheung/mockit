@@ -37,12 +37,18 @@ export function remove(index) {
     };
 }
 
+export function edit(index, enabled) {
+    return function(dispatch) {
+        dispatch(ACTIONS.edit(index, enabled));
+    };
+}
+
 export function update(index, data) {
     return async function(dispatch) {
         dispatch(ACTIONS.beginUpdate(index, data));
         try {
-            await http.put(`/routes/${index}`, data);
-            dispatch(ACTIONS.endUpdate(null, index));
+            const res = await http.put(`/routes/${index}`, data);
+            dispatch(ACTIONS.endUpdate(null, { index, data: res.data }));
         } catch (error) {
             dispatch(ACTIONS.endUpdate(error));
         }

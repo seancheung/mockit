@@ -1,6 +1,7 @@
 export const LIST = 'LIST_ROUTES';
 export const INSERT = 'INSERT_ROUTE';
 export const REMOVE = 'REMOVE_ROUTE';
+export const EDIT = 'EDIT_ROUTE';
 export const UPDATE = 'UPDATE_ROUTE';
 export const EXPORT = 'EXPORT_ROUTES';
 export const IMPORT = 'IMPORT_ROUTES';
@@ -59,6 +60,14 @@ export function endRemove(error, index) {
         pending: false,
         error: error,
         index
+    };
+}
+
+export function edit(index, enabled) {
+    return {
+        type: EDIT,
+        index,
+        enabled
     };
 }
 

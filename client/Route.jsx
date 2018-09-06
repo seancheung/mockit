@@ -23,42 +23,45 @@ class Route extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = { edit: false, data: this.props.data };
+        this.state = Object.assign({}, this.props.data);
     }
 
     render() {
         return (
             <ExpansionPanel className={this.props.classes.root}>
                 <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography variant="button">{`${this.state.data.method.toUpperCase()} ${
-                        this.state.data.path
+                    <Typography variant="button">{`${this.props.data.method.toUpperCase()} ${
+                        this.props.data.path
                     }`}</Typography>
                 </ExpansionPanelSummary>
                 <ExpansionPanelDetails className={this.props.classes.details}>
-                    {this.state.edit ? (
+                    {this.props.data.edit ? (
                         <RouteEdit
-                            {...this.state.data}
+                            {...this.props.data}
                             stateChangedHandler={this.onEdit.bind(this)}
                         />
                     ) : (
-                        <RouteView {...this.state.data} />
+                        <RouteView {...this.props.data} />
                     )}
                 </ExpansionPanelDetails>
                 <Divider />
                 <ExpansionPanelActions>
-                    {this.state.edit ? (
+                    {this.props.data.edit ? (
                         <React.Fragment>
                             <Button
                                 size="small"
                                 color="primary"
-                                onClick={this.endEdit.bind(this)}
+                                onClick={this.update.bind(this)}
                             >
                                 Complete
                             </Button>
                             <Button
                                 size="small"
                                 color="primary"
-                                onClick={this.cancelEdit.bind(this)}
+                                onClick={this.props.editHandler.bind(
+                                    null,
+                                    false
+                                )}
                             >
                                 Cancel
                             </Button>
@@ -68,7 +71,10 @@ class Route extends React.Component {
                             <Button
                                 size="small"
                                 color="primary"
-                                onClick={this.beginEdit.bind(this)}
+                                onClick={this.props.editHandler.bind(
+                                    null,
+                                    true
+                                )}
                             >
                                 Edit
                             </Button>
@@ -86,22 +92,12 @@ class Route extends React.Component {
         );
     }
 
-    beginEdit() {
-        this.setState({ edit: true });
-    }
-
     onEdit(changed) {
-        this.setState({ data: Object.assign({}, this.state.data, changed) });
+        this.setState(changed);
     }
 
-    endEdit() {
-        this.props
-            .updateHandler(this.state.data)
-            .then(() => this.setState({ edit: false }));
-    }
-
-    cancelEdit() {
-        this.setState({ edit: false });
+    update() {
+        this.props.updateHandler(this.state);
     }
 
     static get propTypes() {
@@ -109,6 +105,7 @@ class Route extends React.Component {
             classes: PropTypes.object,
             data: PropTypes.object,
             removeHandler: PropTypes.func,
+            editHandler: PropTypes.func,
             updateHandler: PropTypes.func
         };
     }
