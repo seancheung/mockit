@@ -8,7 +8,6 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Button from '@material-ui/core/Button';
 import Divider from '@material-ui/core/Divider';
 import { withStyles } from '@material-ui/core/styles';
-import PropTypes from 'prop-types';
 import RouteView from './RouteView';
 import RouteEdit from './RouteEdit';
 
@@ -30,7 +29,7 @@ class Route extends React.Component {
         return (
             <ExpansionPanel className={this.props.classes.root}>
                 <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography variant="button">{`${this.props.data.method.toUpperCase()} ${
+                    <Typography variant="title">{`${this.props.data.method.toUpperCase()} ${
                         this.props.data.path
                     }`}</Typography>
                 </ExpansionPanelSummary>
@@ -98,16 +97,6 @@ class Route extends React.Component {
 
     update() {
         this.props.updateHandler(this.state);
-    }
-
-    static get propTypes() {
-        return {
-            classes: PropTypes.object,
-            data: PropTypes.object,
-            removeHandler: PropTypes.func,
-            editHandler: PropTypes.func,
-            updateHandler: PropTypes.func
-        };
     }
 
 }

@@ -1,80 +1,92 @@
 import * as ACTIONS from './actions';
 import http from './http';
 
-export function list(index, size) {
+export function listRoutes(index, size) {
     return async function(dispatch) {
-        dispatch(ACTIONS.beginList(index, size));
+        dispatch(ACTIONS.beginListRoutes(index, size));
         try {
             const res = await http.get('/routes');
-            dispatch(ACTIONS.endList(null, res.data));
+            dispatch(ACTIONS.endListRoutes(null, res.data));
         } catch (error) {
-            dispatch(ACTIONS.endList(error));
+            dispatch(ACTIONS.endListRoutes(error));
         }
     };
 }
 
-export function insert(data) {
+export function insertRoute(data) {
     return async function(dispatch) {
-        dispatch(ACTIONS.beginInsert(data));
+        dispatch(ACTIONS.beginInsertRoute(data));
         try {
             const res = await http.post('/routes', data);
-            dispatch(ACTIONS.endInsert(null, res.data));
+            dispatch(ACTIONS.endInsertRoute(null, res.data));
         } catch (error) {
-            dispatch(ACTIONS.endInsert(error));
+            dispatch(ACTIONS.endInsertRoute(error));
         }
     };
 }
 
-export function remove(index) {
+export function removeRoute(index) {
     return async function(dispatch) {
-        dispatch(ACTIONS.beginRemove(index));
+        dispatch(ACTIONS.beginRemoveRoute(index));
         try {
             await http.delete(`/routes/${index}`);
-            dispatch(ACTIONS.endRemove(null, index));
+            dispatch(ACTIONS.endRemoveRoute(null, index));
         } catch (error) {
-            dispatch(ACTIONS.endInsert(error));
+            dispatch(ACTIONS.endInsertRoute(error));
         }
     };
 }
 
-export function edit(index, enabled) {
+export function editRoute(index, enabled) {
     return function(dispatch) {
-        dispatch(ACTIONS.edit(index, enabled));
+        dispatch(ACTIONS.editRoute(index, enabled));
     };
 }
 
-export function update(index, data) {
+export function updateRoute(index, data) {
     return async function(dispatch) {
-        dispatch(ACTIONS.beginUpdate(index, data));
+        dispatch(ACTIONS.beginUpdateRoute(index, data));
         try {
             const res = await http.put(`/routes/${index}`, data);
-            dispatch(ACTIONS.endUpdate(null, { index, data: res.data }));
+            dispatch(ACTIONS.endUpdateRoute(null, { index, data: res.data }));
         } catch (error) {
-            dispatch(ACTIONS.endUpdate(error));
+            dispatch(ACTIONS.endUpdateRoute(error));
         }
     };
 }
 
-export function dump() {
+export function dumpRoutes() {
     return async function(dispatch) {
-        dispatch(ACTIONS.beginExport());
+        dispatch(ACTIONS.beginExportRoutes());
         try {
             const res = await http.get('/export');
-            dispatch(ACTIONS.endExport(null, res.data));
+            dispatch(ACTIONS.endExportRoutes(null, res.data));
         } catch (error) {
-            dispatch(ACTIONS.endExport(error));
+            dispatch(ACTIONS.endExportRoutes(error));
         }
     };
 }
 
-export function load(data) {
+export function loadRoutes(data) {
     return async function(dispatch) {
-        dispatch(ACTIONS.beginImport(data));
+        dispatch(ACTIONS.beginImportRoutes(data));
         try {
-            const res = await http.get('/import');
-            dispatch(ACTIONS.endImport(null, res.data));
+            const res = await http.post('/import', data);
+            dispatch(ACTIONS.endImportRoutes(null, res.data));
         } catch (error) {
-            dispatch(ACTIONS.endImport(error));
+            dispatch(ACTIONS.endImportRoutes(error));
+        }
+    };
+}
+
+export function getTemplate() {
+    return async function(dispatch) {
+        dispatch(ACTIONS.beginGetTemplate());
+        try {
+            const res = await http.get('/template');
+            dispatch(ACTIONS.endGetTemplate(null, res.data));
+        } catch (error) {
+            dispatch(ACTIONS.endGetTemplate(error));
         }
     };
 }

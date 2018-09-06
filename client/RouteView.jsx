@@ -1,7 +1,6 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-import PropTypes from 'prop-types';
 
 const styles = {
     text: {
@@ -35,18 +34,6 @@ class RouteView extends React.Component {
                 />
             </React.Fragment>
         );
-    }
-
-    static get propTypes() {
-        return {
-            method: PropTypes.string.isRequired,
-            path: PropTypes.string.isRequired,
-            code: PropTypes.number,
-            headers: PropTypes.object,
-            body: PropTypes.string,
-            delay: PropTypes.number,
-            classes: PropTypes.object
-        };
     }
 
 }

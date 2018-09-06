@@ -80,7 +80,7 @@ function start() {
             key: ['K'],
             open: ['O']
         },
-        string: ['host', 'cert', 'key'],
+        string: ['host', 'cert', 'key', 'template'],
         number: ['port'],
         boolean: ['ssl', 'http2', 'open', 'verbose']
     };
@@ -123,6 +123,12 @@ function start() {
     if (argv.verbose) {
         config.debug = true;
     }
+    if (argv.template) {
+        config.dashboard.template = argv.template;
+    }
+    if (config.dashboard.template) {
+        config.dashboard.template = load(config.dashboard.template);
+    }
     prepare(config, () => {
         const server = require('./src/boot')(config);
         const ifaces = require('os').networkInterfaces();
@@ -150,7 +156,8 @@ function start() {
                     })
                 );
             }
-            const dashboard = (config.dashboard && config.dashboard.baseUrl) || '';
+            const dashboard =
+                (config.dashboard && config.dashboard.baseUrl) || '';
             console.log(
                 '\x1b[36m%s\x1b[0m',
                 `Dashboard:\n${protocol}://${host}:${port}${dashboard}`
@@ -184,13 +191,14 @@ function start() {
 function help() {
     console.log('\nUsage: mockit [options] [config]\n');
     console.log('options:');
-    console.log('   -H, --host=<host>   host name');
-    console.log('   -P, --port=<port>   port number');
-    console.log('   -S, --ssl           enable https');
-    console.log('       --http2         enable http2');
-    console.log('   -C, --cert=<path>   ssl cert file path');
-    console.log('   -K, --key=<path>    ssl key file path');
-    console.log('   -O, --open          open browser');
-    console.log('       --verbose       output verbose info');
-    console.log('   -h, --help          show this help');
+    console.log('   -H, --host=<host>       host name');
+    console.log('   -P, --port=<port>       port number');
+    console.log('   -S, --ssl               enable https');
+    console.log('       --http2             enable http2');
+    console.log('       --template=<path>   template path');
+    console.log('   -C, --cert=<path>       ssl cert file path');
+    console.log('   -K, --key=<path>        ssl key file path');
+    console.log('   -O, --open              open browser');
+    console.log('       --verbose           output verbose info');
+    console.log('   -h, --help              show this help');
 }

@@ -1,14 +1,15 @@
-export const LIST = 'LIST_ROUTES';
-export const INSERT = 'INSERT_ROUTE';
-export const REMOVE = 'REMOVE_ROUTE';
-export const EDIT = 'EDIT_ROUTE';
-export const UPDATE = 'UPDATE_ROUTE';
-export const EXPORT = 'EXPORT_ROUTES';
-export const IMPORT = 'IMPORT_ROUTES';
+export const LIST_ROUTES = 'LIST_ROUTES';
+export const INSERT_ROUTE = 'INSERT_ROUTE';
+export const REMOVE_ROUTE = 'REMOVE_ROUTE';
+export const EDIT_ROUTE = 'EDIT_ROUTE';
+export const UPDATE_ROUTE = 'UPDATE_ROUTE';
+export const EXPORT_ROUTES = 'EXPORT_ROUTES';
+export const IMPORT_ROUTES = 'IMPORT_ROUTES';
+export const GET_TEMPLATE = 'GET_TEMPLATE';
 
-export function beginList(index, size) {
+export function beginListRoutes(index, size) {
     return {
-        type: LIST,
+        type: LIST_ROUTES,
         pending: true,
         error: null,
         pagination: {
@@ -18,62 +19,62 @@ export function beginList(index, size) {
     };
 }
 
-export function endList(error, data) {
+export function endListRoutes(error, data) {
     return {
-        type: LIST,
+        type: LIST_ROUTES,
         pending: false,
         error: error,
         data
     };
 }
 
-export function beginInsert(data) {
+export function beginInsertRoute(data) {
     return {
-        type: INSERT,
+        type: INSERT_ROUTE,
         pending: true,
         error: null,
         data
     };
 }
 
-export function endInsert(error, data) {
+export function endInsertRoute(error, data) {
     return {
-        type: INSERT,
+        type: INSERT_ROUTE,
         pending: false,
         error: error,
         data
     };
 }
 
-export function beginRemove(index) {
+export function beginRemoveRoute(index) {
     return {
-        type: REMOVE,
+        type: REMOVE_ROUTE,
         pending: true,
         error: null,
         index
     };
 }
 
-export function endRemove(error, index) {
+export function endRemoveRoute(error, index) {
     return {
-        type: REMOVE,
+        type: REMOVE_ROUTE,
         pending: false,
         error: error,
         index
     };
 }
 
-export function edit(index, enabled) {
+export function editRoute(index, enabled) {
     return {
-        type: EDIT,
+        type: EDIT_ROUTE,
         index,
         enabled
     };
 }
 
-export function beginUpdate(index, data) {
+export function beginUpdateRoute(index, data) {
     return {
-        type: UPDATE,
+        type: UPDATE_ROUTE,
         pending: true,
         error: null,
         index,
@@ -81,9 +82,9 @@ export function beginUpdate(index, data) {
     };
 }
 
-export function endUpdate(error, { index, data } = {}) {
+export function endUpdateRoute(error, { index, data } = {}) {
     return {
-        type: UPDATE,
+        type: UPDATE_ROUTE,
         pending: false,
         error: error,
         index,
@@ -91,35 +92,52 @@ export function endUpdate(error, { index, data } = {}) {
     };
 }
 
-export function beginExport() {
+export function beginExportRoutes() {
     return {
-        type: EXPORT,
+        type: EXPORT_ROUTES,
         pending: true,
         error: null
     };
 }
 
-export function endExport(error, data) {
+export function endExportRoutes(error, data) {
     return {
-        type: EXPORT,
+        type: EXPORT_ROUTES,
         pending: false,
         error: error,
         data
     };
 }
 
-export function beginImport(data) {
+export function beginImportRoutes(data) {
     return {
-        type: IMPORT,
+        type: IMPORT_ROUTES,
         pending: true,
         error: null,
         data
     };
 }
 
-export function endImport(error, data) {
+export function endImportRoutes(error, data) {
     return {
-        type: IMPORT,
+        type: IMPORT_ROUTES,
+        pending: false,
+        error: error,
+        data
+    };
+}
+
+export function beginGetTemplate() {
+    return {
+        type: GET_TEMPLATE,
+        pending: false,
+        error: null
+    };
+}
+
+export function endGetTemplate(error, data) {
+    return {
+        type: GET_TEMPLATE,
         pending: false,
         error: error,
         data

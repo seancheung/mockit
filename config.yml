@@ -1,16 +1,17 @@
-host: '127.0.0.1'
+host: "127.0.0.1"
 port: 0
 http2: false
 ssl:
   enabled: false
-  cert: '/path/to/cert/file'
-  key: '/path/to/key/file'
+  cert: "/path/to/cert/file"
+  key: "/path/to/key/file"
 debug: true
 logger:
   enabled: true
-  type: 'combined'
+  type: "combined"
 dashboard:
-  baseUrl: '/dashboard'
+  baseUrl: "/dashboard"
+  template: 'template.yml'
 router:
   cors: true
   routes:
@@ -19,7 +20,7 @@ router:
       delay: 1000
       code: 200
       headers:
-        Content-Type: 'application/json'
+        Content-Type: "application/json"
         Server: Nginx
       body: '{"name":"admin"}'
     PUT /api/v1/account:
@@ -27,6 +28,6 @@ router:
       delay: 0
       code: 200
       headers:
-        Content-Type: 'application/json'
+        Content-Type: "application/json"
         Server: Nginx
       body: '{"name":"admin"}'

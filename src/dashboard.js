@@ -161,6 +161,14 @@ module.exports = (app, config, db, router, options) => {
         }
     });
 
+    dashboard.get('/template', (req, res, next) => {
+        try {
+            res.json(config.template);
+        } catch (error) {
+            next(error);
+        }
+    });
+
     dashboard.get('/export', (req, res, next) => {
         try {
             let data = db.dump(),
