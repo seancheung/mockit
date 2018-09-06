@@ -23,26 +23,25 @@ class Route extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = { edit: false };
-        this.beginEdit = this.beginEdit.bind(this);
-        this.endEdit = this.endEdit.bind(this);
-        this.cancelEdit = this.cancelEdit.bind(this);
-        this.remove = this.remove.bind(this);
+        this.state = { edit: false, data: this.props.data };
     }
 
     render() {
         return (
             <ExpansionPanel className={this.props.classes.root}>
                 <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography variant="button">{`${this.props.method.toUpperCase()} ${
-                        this.props.path
+                    <Typography variant="button">{`${this.state.data.method.toUpperCase()} ${
+                        this.state.data.path
                     }`}</Typography>
                 </ExpansionPanelSummary>
                 <ExpansionPanelDetails className={this.props.classes.details}>
                     {this.state.edit ? (
-                        <RouteEdit {...this.getProps()} />
+                        <RouteEdit
+                            {...this.state.data}
+                            stateChangedHandler={this.onEdit.bind(this)}
+                        />
                     ) : (
-                        <RouteView {...this.getProps()} />
+                        <RouteView {...this.state.data} />
                     )}
                 </ExpansionPanelDetails>
                 <Divider />
@@ -52,14 +51,14 @@ class Route extends React.Component {
                             <Button
                                 size="small"
                                 color="primary"
-                                onClick={this.endEdit}
+                                onClick={this.endEdit.bind(this)}
                             >
                                 Complete
                             </Button>
                             <Button
                                 size="small"
                                 color="primary"
-                                onClick={this.cancelEdit}
+                                onClick={this.cancelEdit.bind(this)}
                             >
                                 Cancel
                             </Button>
@@ -69,14 +68,14 @@ class Route extends React.Component {
                             <Button
                                 size="small"
                                 color="primary"
-                                onClick={this.beginEdit}
+                                onClick={this.beginEdit.bind(this)}
                             >
                                 Edit
                             </Button>
                             <Button
                                 size="small"
                                 color="secondary"
-                                onClick={this.remove}
+                                onClick={this.props.removeHandler}
                             >
                                 Delete
                             </Button>
@@ -87,38 +86,30 @@ class Route extends React.Component {
         );
     }
 
-    getProps() {
-        return {
-            method: this.props.method,
-            path: this.props.path,
-            code: this.props.code,
-            headers: this.props.headers,
-            body: this.props.body,
-            delay: this.props.delay
-        };
-    }
-
     beginEdit() {
         this.setState({ edit: true });
     }
 
-    endEdit() {}
+    onEdit(changed) {
+        this.setState({ data: Object.assign({}, this.state.data, changed) });
+    }
+
+    endEdit() {
+        this.props
+            .updateHandler(this.state.data)
+            .then(() => this.setState({ edit: false }));
+    }
 
     cancelEdit() {
         this.setState({ edit: false });
     }
 
-    remove() {}
-
     static get propTypes() {
         return {
-            method: PropTypes.string.isRequired,
-            path: PropTypes.string.isRequired,
-            code: PropTypes.number,
-            headers: PropTypes.object,
-            body: PropTypes.string,
-            delay: PropTypes.number,
-            classes: PropTypes.object
+            classes: PropTypes.object,
+            data: PropTypes.object,
+            removeHandler: PropTypes.func,
+            updateHandler: PropTypes.func
         };
     }
 

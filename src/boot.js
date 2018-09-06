@@ -9,6 +9,9 @@ module.exports = config => {
         db.load(config.router.routes);
     }
     const app = require('./app');
+    if (config.logger && config.logger.enabled) {
+        app.use(require('morgan')(config.logger.type || 'combined'));
+    }
     const router = require('./router')(app, config.router, db);
     require('./dashboard')(app, config.dashboard, db, router, options);
     require('./handler')(app);

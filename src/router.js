@@ -4,10 +4,6 @@ const routing = require('./routing');
 module.exports = (app, config, db) => {
     const router = express.Router({ mergeParams: true });
 
-    if (config.logger && config.logger.enabled) {
-        router.use(require('morgan')(config.logger.type || 'combined'));
-    }
-
     if (config.cors) {
         router.use((req, res, next) => {
             res.header('Access-Control-Allow-Origin', '*');

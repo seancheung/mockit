@@ -33,10 +33,6 @@ module.exports = (app, config, db, router, options) => {
     );
     dashboard.use(express.static(path.resolve(__dirname, '../client/public')));
 
-    if (config.logger && config.logger.enabled) {
-        router.use(require('morgan')(config.logger.type || 'combined'));
-    }
-
     dashboard.get('/routes', (req, res, next) => {
         try {
             const docs = db.all();
@@ -177,6 +173,21 @@ module.exports = (app, config, db, router, options) => {
                 ext = 'json';
             }
             res.type(ext).send(data);
+        } catch (error) {
+            next(error);
+        }
+    });
+
+    dashboard.post('/import', (req, res, next) => {
+        try {
+            let data;
+            if (/ya?ml$/i.test(req.headers['content-type'])) {
+                data = require('js-yaml').safeLoad(req.body);
+            } else {
+                data = JSON.parse(req.body);
+            }
+            db.load(data);
+            res.status(201).end();
         } catch (error) {
             next(error);
         }

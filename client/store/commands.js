@@ -1,5 +1,5 @@
 import * as ACTIONS from './actions';
-import http from '../http';
+import http from './http';
 
 export function list(index, size) {
     return async function(dispatch) {
@@ -45,6 +45,30 @@ export function update(index, data) {
             dispatch(ACTIONS.endUpdate(null, index));
         } catch (error) {
             dispatch(ACTIONS.endUpdate(error));
+        }
+    };
+}
+
+export function dump() {
+    return async function(dispatch) {
+        dispatch(ACTIONS.beginExport());
+        try {
+            const res = await http.get('/export');
+            dispatch(ACTIONS.endExport(null, res.data));
+        } catch (error) {
+            dispatch(ACTIONS.endExport(error));
+        }
+    };
+}
+
+export function load(data) {
+    return async function(dispatch) {
+        dispatch(ACTIONS.beginImport(data));
+        try {
+            const res = await http.get('/import');
+            dispatch(ACTIONS.endImport(null, res.data));
+        } catch (error) {
+            dispatch(ACTIONS.endImport(error));
         }
     };
 }

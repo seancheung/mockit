@@ -22,7 +22,6 @@ export function endList(error, data) {
         type: LIST,
         pending: false,
         error: error,
-        success: error == null,
         data
     };
 }
@@ -41,7 +40,6 @@ export function endInsert(error, data) {
         type: INSERT,
         pending: false,
         error: error,
-        success: error == null,
         data
     };
 }
@@ -60,7 +58,6 @@ export function endRemove(error, index) {
         type: REMOVE,
         pending: false,
         error: error,
-        success: error == null,
         index
     };
 }
@@ -80,8 +77,42 @@ export function endUpdate(error, { index, data } = {}) {
         type: UPDATE,
         pending: false,
         error: error,
-        success: error == null,
         index,
+        data
+    };
+}
+
+export function beginExport() {
+    return {
+        type: EXPORT,
+        pending: true,
+        error: null
+    };
+}
+
+export function endExport(error, data) {
+    return {
+        type: EXPORT,
+        pending: false,
+        error: error,
+        data
+    };
+}
+
+export function beginImport(data) {
+    return {
+        type: IMPORT,
+        pending: true,
+        error: null,
+        data
+    };
+}
+
+export function endImport(error, data) {
+    return {
+        type: IMPORT,
+        pending: false,
+        error: error,
         data
     };
 }

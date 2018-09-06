@@ -1,6 +1,9 @@
 import * as ACTIONS from './actions';
 
-export function app(state = { pending: false, error: null }, action) {
+export function app(
+    state = { pending: false, error: null, index: 0, size: 10 },
+    action
+) {
     if (action.pending) {
         return Object.assign({}, state, { pending: true, error: null });
     }
@@ -15,10 +18,11 @@ export function app(state = { pending: false, error: null }, action) {
 }
 
 export function routes(state = [], action) {
-    if (!action.success) {
+    if (action.pending || action.error) {
         return state;
     }
     switch (action.type) {
+    case ACTIONS.IMPORT:
     case ACTIONS.LIST:
         return action.data;
     case ACTIONS.INSERT:
@@ -33,6 +37,9 @@ export function routes(state = [], action) {
 
             return route;
         });
+    case ACTIONS.EXPORT:
+        // TODO:
+        return state;
     default:
         return state;
     }

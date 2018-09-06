@@ -37,7 +37,13 @@ class EditRoute extends React.Component {
     }
 
     handleChange(e) {
-        this.setState({ [e.target.id]: e.target.value });
+        let value = e.target.value;
+        if (typeof this.state[e.target.id] === 'number') {
+            value = Number(value);
+        }
+        const changed = { [e.target.id]: value };
+        this.setState(changed);
+        this.props.stateChangedHandler(changed);
     }
 
     static get propTypes() {
@@ -48,7 +54,8 @@ class EditRoute extends React.Component {
             headers: PropTypes.object,
             body: PropTypes.string,
             delay: PropTypes.number,
-            classes: PropTypes.object
+            classes: PropTypes.object,
+            stateChangedHandler: PropTypes.func
         };
     }
 
