@@ -1,3 +1,13 @@
+methods:
+  - 'GET'
+  - 'HEAD'
+  - 'POST'
+  - 'PUT'
+  - 'DELETE'
+  - 'CONNECT'
+  - 'OPTIONS'
+  - 'TRACE'
+  - 'PATCH'
 codes:
   "100": "Continue"
   "101": "Switching Protocols"

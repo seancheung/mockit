@@ -9,7 +9,6 @@ class EditRoute extends React.Component {
     constructor(props) {
         super(props);
         this.state = { code: props.code, body: props.body };
-        this.handleChange = this.handleChange.bind(this);
     }
 
     render() {
@@ -19,7 +18,7 @@ class EditRoute extends React.Component {
                     id="code"
                     label="Status Code"
                     value={this.state.code}
-                    onChange={this.handleChange}
+                    onChange={this.handleChange.bind(this)}
                     type="number"
                     margin="normal"
                 />
@@ -27,7 +26,7 @@ class EditRoute extends React.Component {
                     id="body"
                     label="Body"
                     value={this.state.body}
-                    onChange={this.handleChange}
+                    onChange={this.handleChange.bind(this)}
                     multiline
                     margin="normal"
                 />
