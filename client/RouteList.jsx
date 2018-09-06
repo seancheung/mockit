@@ -2,12 +2,24 @@ import React from 'react';
 import { connect } from 'react-redux';
 import Route from './Route';
 import dispatcher from './store/dispatcher';
+import { withStyles } from '@material-ui/core/styles';
+
+const styles = theme => ({
+    content: {
+        flexGrow: 1,
+        padding: theme.spacing.unit * 2,
+        height: '90vh',
+        overflow: 'auto'
+    },
+    space: theme.mixins.toolbar
+});
 
 class RouteList extends React.Component {
 
     render() {
         return (
-            <div>
+            <div className={this.props.classes.content}>
+                <div className={this.props.classes.space} />
                 {this.props.routes.map((data, index) => (
                     <Route
                         key={index}
@@ -28,7 +40,9 @@ class RouteList extends React.Component {
 
 }
 
-export default connect(
-    state => ({ app: state.app, routes: state.routes }),
-    dispatcher
-)(RouteList);
+export default withStyles(styles)(
+    connect(
+        state => ({ app: state.app, routes: state.routes }),
+        dispatcher
+    )(RouteList)
+);

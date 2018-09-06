@@ -9,6 +9,7 @@ import UploadIcon from '@material-ui/icons/FileUpload';
 import DownloadIcon from '@material-ui/icons/FileDownload';
 import purple from '@material-ui/core/colors/purple';
 import green from '@material-ui/core/colors/green';
+import grey from '@material-ui/core/colors/cyan';
 import { withStyles } from '@material-ui/core/styles';
 import dispatcher from './store/dispatcher';
 import RouteCreate from './RouteCreate';
@@ -32,7 +33,7 @@ class Top extends React.Component {
     render() {
         return (
             <div>
-                <AppBar position="static" color="default">
+                <AppBar position="absolute" color="primary">
                     <Toolbar>
                         <Typography
                             variant="title"
@@ -47,6 +48,7 @@ class Top extends React.Component {
                             mini
                             color="primary"
                             aria-label="Add"
+                            style={{ backgroundColor: grey['500'] }}
                             onClick={() => this.setState({ create: true })}
                         >
                             <AddIcon />
