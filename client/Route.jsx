@@ -38,6 +38,94 @@ class Route extends React.Component {
     }
 
     render() {
+        let view, menu;
+        if (this.props.data.edit) {
+            view = (
+                <RouteEdit
+                    {...this.props.data}
+                    template={this.props.template}
+                    stateChangedHandler={this.handleEdit.bind(this)}
+                />
+            );
+        } else {
+            view = <RouteView {...this.props.data} />;
+        }
+        if (this.props.data.edit) {
+            menu = (
+                <React.Fragment>
+                    <Zoom
+                        in={this.state.expanded}
+                        unmountOnExit
+                        timeout={transition}
+                    >
+                        <Button
+                            className={this.props.classes.button}
+                            variant="fab"
+                            mini
+                            color="primary"
+                            aria-label="Complete"
+                            onClick={this.handleUpdate.bind(this)}
+                        >
+                            <CheckIcon />
+                        </Button>
+                    </Zoom>
+                    <Zoom
+                        in={this.state.expanded}
+                        unmountOnExit
+                        timeout={transition}
+                    >
+                        <Button
+                            className={this.props.classes.button}
+                            variant="fab"
+                            mini
+                            color="secondary"
+                            aria-label="Cancel"
+                            onClick={this.props.editHandler.bind(null, false)}
+                        >
+                            <CancelIcon />
+                        </Button>
+                    </Zoom>
+                </React.Fragment>
+            );
+        } else {
+            menu = (
+                <React.Fragment>
+                    <Zoom
+                        in={this.state.expanded}
+                        unmountOnExit
+                        timeout={transition}
+                    >
+                        <Button
+                            className={this.props.classes.button}
+                            variant="fab"
+                            mini
+                            color="primary"
+                            aria-label="Edit"
+                            onClick={this.props.editHandler.bind(null, true)}
+                        >
+                            <EditIcon />
+                        </Button>
+                    </Zoom>
+                    <Zoom
+                        in={this.state.expanded}
+                        unmountOnExit
+                        timeout={transition}
+                    >
+                        <Button
+                            className={this.props.classes.button}
+                            variant="fab"
+                            mini
+                            color="secondary"
+                            aria-label="Delete"
+                            onClick={this.props.removeHandler}
+                        >
+                            <DeleteIcon />
+                        </Button>
+                    </Zoom>
+                </React.Fragment>
+            );
+        }
+
         return (
             <ExpansionPanel
                 onChange={(e, expanded) => this.setState({ expanded })}
@@ -48,95 +136,10 @@ class Route extends React.Component {
                     }`}</Typography>
                 </ExpansionPanelSummary>
                 <ExpansionPanelDetails className={this.props.classes.details}>
-                    {this.props.data.edit ? (
-                        <RouteEdit
-                            {...this.props.data}
-                            stateChangedHandler={this.handleEdit.bind(this)}
-                        />
-                    ) : (
-                        <RouteView {...this.props.data} />
-                    )}
+                    {view}
                 </ExpansionPanelDetails>
                 <Divider />
-                <ExpansionPanelActions>
-                    {this.props.data.edit ? (
-                        <React.Fragment>
-                            <Zoom
-                                in={this.state.expanded}
-                                unmountOnExit
-                                timeout={transition}
-                            >
-                                <Button
-                                    className={this.props.classes.button}
-                                    variant="fab"
-                                    mini
-                                    color="primary"
-                                    aria-label="Complete"
-                                    onClick={this.handleUpdate.bind(this)}
-                                >
-                                    <CheckIcon />
-                                </Button>
-                            </Zoom>
-                            <Zoom
-                                in={this.state.expanded}
-                                unmountOnExit
-                                timeout={transition}
-                            >
-                                <Button
-                                    className={this.props.classes.button}
-                                    variant="fab"
-                                    mini
-                                    color="secondary"
-                                    aria-label="Cancel"
-                                    onClick={this.props.editHandler.bind(
-                                        null,
-                                        false
-                                    )}
-                                >
-                                    <CancelIcon />
-                                </Button>
-                            </Zoom>
-                        </React.Fragment>
-                    ) : (
-                        <React.Fragment>
-                            <Zoom
-                                in={this.state.expanded}
-                                unmountOnExit
-                                timeout={transition}
-                            >
-                                <Button
-                                    className={this.props.classes.button}
-                                    variant="fab"
-                                    mini
-                                    color="primary"
-                                    aria-label="Edit"
-                                    onClick={this.props.editHandler.bind(
-                                        null,
-                                        true
-                                    )}
-                                >
-                                    <EditIcon />
-                                </Button>
-                            </Zoom>
-                            <Zoom
-                                in={this.state.expanded}
-                                unmountOnExit
-                                timeout={transition}
-                            >
-                                <Button
-                                    className={this.props.classes.button}
-                                    variant="fab"
-                                    mini
-                                    color="secondary"
-                                    aria-label="Delete"
-                                    onClick={this.props.removeHandler}
-                                >
-                                    <DeleteIcon />
-                                </Button>
-                            </Zoom>
-                        </React.Fragment>
-                    )}
-                </ExpansionPanelActions>
+                <ExpansionPanelActions>{menu}</ExpansionPanelActions>
             </ExpansionPanel>
         );
     }

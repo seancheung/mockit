@@ -35,7 +35,7 @@ module.exports = (app, config, db, target, options) => {
     dashboard.head('/routes', (req, res, next) => {
         try {
             const success = db.exists(req.query.method, req.query.path);
-            res.status(success ? 200 : 404).end();
+            res.status(success ? 409 : 200).end();
         } catch (error) {
             next(error);
         }
@@ -104,7 +104,7 @@ module.exports = (app, config, db, target, options) => {
     dashboard.head('/routes/:id', (req, res, next) => {
         try {
             const success = db.has(req.params.id);
-            res.status(success ? 200 : 404).end();
+            res.status(success ? 409 : 200).end();
         } catch (error) {
             next(error);
         }

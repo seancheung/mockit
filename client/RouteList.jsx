@@ -30,6 +30,7 @@ class RouteList extends React.Component {
                     <Route
                         key={index}
                         data={data}
+                        template={this.props.app.template}
                         removeHandler={() =>
                             this.setState({ selected: data.id })
                         }

@@ -1,8 +1,16 @@
 import React from 'react';
 import TextField from '@material-ui/core/TextField';
+import MenuItem from '@material-ui/core/MenuItem';
 import { withStyles } from '@material-ui/core/styles';
 
-const styles = {};
+const styles = {
+    menu: {
+        witdh: 200
+    },
+    field: {
+        display: 'block'
+    }
+};
 
 class EditRoute extends React.Component {
 
@@ -15,20 +23,33 @@ class EditRoute extends React.Component {
         return (
             <React.Fragment>
                 <TextField
-                    id="code"
+                    name="code"
+                    select
                     label="Status Code"
+                    margin="normal"
+                    className={this.props.classes.field}
+                    SelectProps={{
+                        MenuProps: {
+                            className: this.props.classes.menu
+                        }
+                    }}
                     value={this.state.code}
                     onChange={this.handleChange.bind(this)}
-                    type="number"
-                    margin="normal"
-                />
+                >
+                    {Object.entries(this.props.template.codes).map(([k, v]) => (
+                        <MenuItem key={k} value={parseInt(k)}>
+                            {k} {v}
+                        </MenuItem>
+                    ))}
+                </TextField>
                 <TextField
-                    id="body"
+                    name="body"
                     label="Body"
-                    value={this.state.body}
-                    onChange={this.handleChange.bind(this)}
                     multiline
                     margin="normal"
+                    className={this.props.classes.field}
+                    value={this.state.body}
+                    onChange={this.handleChange.bind(this)}
                 />
             </React.Fragment>
         );
@@ -36,10 +57,10 @@ class EditRoute extends React.Component {
 
     handleChange(e) {
         let value = e.target.value;
-        if (typeof this.state[e.target.id] === 'number') {
+        if (typeof this.state[e.target.name] === 'number') {
             value = Number(value);
         }
-        const changed = { [e.target.id]: value };
+        const changed = { [e.target.name]: value };
         this.setState(changed);
         this.props.stateChangedHandler(changed);
     }

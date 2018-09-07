@@ -16,6 +16,8 @@ export function app(
         return Object.assign({}, state, { pending: true, error: null });
     }
     if (action.error) {
+        // console.error(action.error);
+
         return Object.assign({}, state, {
             pending: false,
             error: action.error

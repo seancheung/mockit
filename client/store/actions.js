@@ -11,7 +11,6 @@ export function beginListRoutes(index, size) {
     return {
         type: LIST_ROUTES,
         pending: true,
-        error: null,
         offset: index * size,
         limit: size
     };
@@ -20,7 +19,6 @@ export function beginListRoutes(index, size) {
 export function endListRoutes(error, data) {
     const action = {
         type: LIST_ROUTES,
-        pending: false,
         error: error
     };
     if (data) {
@@ -41,7 +39,6 @@ export function beginInsertRoute(data) {
     return {
         type: INSERT_ROUTE,
         pending: true,
-        error: null,
         data
     };
 }
@@ -49,7 +46,6 @@ export function beginInsertRoute(data) {
 export function endInsertRoute(error, data) {
     return {
         type: INSERT_ROUTE,
-        pending: false,
         error: error,
         data
     };
@@ -59,7 +55,6 @@ export function beginRemoveRoute(id) {
     return {
         type: REMOVE_ROUTE,
         pending: true,
-        error: null,
         id
     };
 }
@@ -67,7 +62,6 @@ export function beginRemoveRoute(id) {
 export function endRemoveRoute(error, id) {
     return {
         type: REMOVE_ROUTE,
-        pending: false,
         error: error,
         id
     };
@@ -85,7 +79,6 @@ export function beginUpdateRoute(id, data) {
     return {
         type: UPDATE_ROUTE,
         pending: true,
-        error: null,
         id,
         data
     };
@@ -94,7 +87,6 @@ export function beginUpdateRoute(id, data) {
 export function endUpdateRoute(error, { id, data } = {}) {
     return {
         type: UPDATE_ROUTE,
-        pending: false,
         error: error,
         id,
         data
@@ -112,7 +104,6 @@ export function beginExportRoutes() {
 export function endExportRoutes(error, data) {
     return {
         type: EXPORT_ROUTES,
-        pending: false,
         error: error,
         data
     };
@@ -122,7 +113,6 @@ export function beginImportRoutes(data) {
     return {
         type: IMPORT_ROUTES,
         pending: true,
-        error: null,
         data
     };
 }
@@ -130,7 +120,6 @@ export function beginImportRoutes(data) {
 export function endImportRoutes(error, data) {
     return {
         type: IMPORT_ROUTES,
-        pending: false,
         error: error,
         data
     };
@@ -139,7 +128,7 @@ export function endImportRoutes(error, data) {
 export function beginGetTemplate() {
     return {
         type: GET_TEMPLATE,
-        pending: false,
+        pending: true,
         error: null
     };
 }
@@ -147,7 +136,6 @@ export function beginGetTemplate() {
 export function endGetTemplate(error, data) {
     return {
         type: GET_TEMPLATE,
-        pending: false,
         error: error,
         data
     };
