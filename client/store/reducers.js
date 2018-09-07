@@ -1,7 +1,15 @@
 import * as ACTIONS from './actions';
 
 export function app(
-    state = { pending: false, error: null, index: 0, size: 10, template: null },
+    state = {
+        pending: false,
+        error: null,
+        index: 0,
+        size: 10,
+        pages: 0,
+        count: 0,
+        template: null
+    },
     action
 ) {
     if (action.pending) {
@@ -17,6 +25,14 @@ export function app(
     switch (action.type) {
     case ACTIONS.GET_TEMPLATE:
         return Object.assign({}, state, { template: action.data });
+    case ACTIONS.LIST_ROUTES: {
+        return Object.assign({}, state, {
+            index: action.index,
+            size: action.size,
+            pages: action.pages,
+            count: action.count
+        });
+    }
     default:
         return state;
     }
@@ -28,15 +44,21 @@ export function routes(state = [], action) {
     }
     switch (action.type) {
     case ACTIONS.IMPORT_ROUTES:
+        // TODO:
+        return state;
     case ACTIONS.LIST_ROUTES:
         return action.data;
     case ACTIONS.INSERT_ROUTE:
-        return [...state, action.data];
+        // return [...state, action.data];
+        // NOTE: pagination support
+        return state;
     case ACTIONS.REMOVE_ROUTE:
-        return state.filter((_, i) => i !== action.index);
+        // return state.filter(data => data.id !== action.id);
+        // NOTE: pagination support
+        return state;
     case ACTIONS.UPDATE_ROUTE:
-        return state.map((data, i) => {
-            if (action.index === i) {
+        return state.map(data => {
+            if (action.id === data.id) {
                 return Object.assign({}, data, action.data, {
                     edit: false
                 });
@@ -45,8 +67,8 @@ export function routes(state = [], action) {
             return data;
         });
     case ACTIONS.EDIT_ROUTE:
-        return state.map((data, i) => {
-            if (action.index === i) {
+        return state.map(data => {
+            if (action.id === data.id) {
                 return Object.assign({}, data, { edit: action.enabled });
             }
 

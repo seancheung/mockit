@@ -12,20 +12,29 @@ export function beginListRoutes(index, size) {
         type: LIST_ROUTES,
         pending: true,
         error: null,
-        pagination: {
-            index,
-            size
-        }
+        offset: index * size,
+        limit: size
     };
 }
 
 export function endListRoutes(error, data) {
-    return {
+    const action = {
         type: LIST_ROUTES,
         pending: false,
-        error: error,
-        data
+        error: error
     };
+    if (data) {
+        const { offset, limit, count, records } = data;
+        Object.assign(action, {
+            data: records,
+            index: Math.ceil(offset / limit),
+            size: limit,
+            pages: Math.ceil(count / limit),
+            count
+        });
+    }
+
+    return action;
 }
 
 export function beginInsertRoute(data) {
@@ -46,48 +55,48 @@ export function endInsertRoute(error, data) {
     };
 }
 
-export function beginRemoveRoute(index) {
+export function beginRemoveRoute(id) {
     return {
         type: REMOVE_ROUTE,
         pending: true,
         error: null,
-        index
+        id
     };
 }
 
-export function endRemoveRoute(error, index) {
+export function endRemoveRoute(error, id) {
     return {
         type: REMOVE_ROUTE,
         pending: false,
         error: error,
-        index
+        id
     };
 }
 
-export function editRoute(index, enabled) {
+export function editRoute(id, enabled) {
     return {
         type: EDIT_ROUTE,
-        index,
+        id,
         enabled
     };
 }
 
-export function beginUpdateRoute(index, data) {
+export function beginUpdateRoute(id, data) {
     return {
         type: UPDATE_ROUTE,
         pending: true,
         error: null,
-        index,
+        id,
         data
     };
 }
 
-export function endUpdateRoute(error, { index, data } = {}) {
+export function endUpdateRoute(error, { id, data } = {}) {
     return {
         type: UPDATE_ROUTE,
         pending: false,
         error: error,
-        index,
+        id,
         data
     };
 }

@@ -16,7 +16,9 @@ module.exports = (app, config, db) => {
                 next();
             });
         }
-        routing.mount(router, ...db.all());
+        for (const doc of db.all()) {
+            routing.mount(router, doc);
+        }
         target.router = router;
     }
 

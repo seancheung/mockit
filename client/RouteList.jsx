@@ -30,9 +30,14 @@ class RouteList extends React.Component {
                     <Route
                         key={index}
                         data={data}
-                        removeHandler={() => this.setState({ selected: index })}
-                        updateHandler={this.props.updateRoute.bind(this, index)}
-                        editHandler={this.props.editRoute.bind(this, index)}
+                        removeHandler={() =>
+                            this.setState({ selected: data.id })
+                        }
+                        updateHandler={this.props.updateRoute.bind(
+                            this,
+                            data.id
+                        )}
+                        editHandler={this.props.editRoute.bind(this, data.id)}
                     />
                 ))}
                 <RouteDelete
@@ -49,9 +54,10 @@ class RouteList extends React.Component {
         this.props.listRoutes(this.props.app.index, this.props.app.size);
     }
 
-    handleDelete() {
-        this.props.removeRoute(this.state.selected);
+    async handleDelete() {
+        await this.props.removeRoute(this.state.selected);
         this.setState({ selected: null });
+        await this.props.listRoutes(this.props.app.index, this.props.app.size);
     }
 
 }

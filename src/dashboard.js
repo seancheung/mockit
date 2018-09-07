@@ -34,8 +34,11 @@ module.exports = (app, config, db, target, options) => {
 
     dashboard.get('/routes', (req, res, next) => {
         try {
-            const docs = db.all();
-            res.json(docs);
+            const offset = req.query.offset ? parseInt(req.query.offset) : 0;
+            const limit = req.query.limit && parseInt(req.query.limit);
+            const count = db.count();
+            const records = Array.from(db.select(offset, limit));
+            res.json({ count, offset, limit, records });
         } catch (error) {
             next(error);
         }
@@ -89,9 +92,9 @@ module.exports = (app, config, db, target, options) => {
         }
     });
 
-    dashboard.get('/routes/:index', (req, res, next) => {
+    dashboard.get('/routes/:id', (req, res, next) => {
         try {
-            const doc = db.findAt(req.params.index);
+            const doc = db.find(req.params.id);
             if (!doc) {
                 const error = new Error('not found');
                 error.status = 404;
@@ -103,9 +106,9 @@ module.exports = (app, config, db, target, options) => {
         }
     });
 
-    dashboard.put('/routes/:index', (req, res, next) => {
+    dashboard.put('/routes/:id', (req, res, next) => {
         try {
-            if (!db.existsAt(req.params.index)) {
+            if (!db.has(req.params.id)) {
                 const error = new Error('not found');
                 error.status = 404;
                 throw error;
@@ -127,7 +130,7 @@ module.exports = (app, config, db, target, options) => {
             if (bypass != undefined) {
                 data.bypass = bypass;
             }
-            const doc = db.updateAt(req.params.index, data);
+            const doc = db.update(req.params.id, data);
             if (!doc) {
                 const error = new Error('failed to update data');
                 error.status = 500;
@@ -140,17 +143,11 @@ module.exports = (app, config, db, target, options) => {
         }
     });
 
-    dashboard.delete('/routes/:index', (req, res, next) => {
+    dashboard.delete('/routes/:id', (req, res, next) => {
         try {
-            const doc = db.findAt(req.params.index);
-            if (!doc) {
+            if (!db.remove(req.params.id)) {
                 const error = new Error('not found');
                 error.status = 404;
-                throw error;
-            }
-            if (!db.removeAt(req.params.index)) {
-                const error = new Error('failed to remove data');
-                error.status = 500;
                 throw error;
             }
             target.reload();
@@ -168,18 +165,13 @@ module.exports = (app, config, db, target, options) => {
         }
     });
 
-    dashboard.get('/export', (req, res, next) => {
+    dashboard.get('/export', async (req, res, next) => {
         try {
-            let data = db.dump(),
-                ext;
-            if (/ya?ml$/i.test(req.headers.accept)) {
-                data = require('js-yaml').safeDump(data);
-                ext = 'yaml';
+            if (/ya?ml$/i.test(req.headers['accept'])) {
+                await db.ydump(res.type('yaml'));
             } else {
-                data = JSON.stringify(data);
-                ext = 'json';
+                await db.dump(res.type('json'));
             }
-            res.type(ext).send(data);
         } catch (error) {
             next(error);
         }
@@ -188,10 +180,10 @@ module.exports = (app, config, db, target, options) => {
     dashboard.post('/import', (req, res, next) => {
         try {
             let data;
-            if (/ya?ml$/i.test(req.headers['content-type'])) {
-                data = require('js-yaml').safeLoad(req.body);
+            if (/ya?ml$/i.test(req.body.type)) {
+                data = require('js-yaml').safeLoad(req.body.data);
             } else {
-                data = JSON.parse(req.body);
+                data = JSON.parse(req.body.data);
             }
             db.load(data);
             res.status(201).end();

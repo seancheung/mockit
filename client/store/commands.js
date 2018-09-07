@@ -3,9 +3,15 @@ import http from './http';
 
 export function listRoutes(index, size) {
     return async function(dispatch) {
-        dispatch(ACTIONS.beginListRoutes(index, size));
+        const action = ACTIONS.beginListRoutes(index, size);
+        dispatch(action);
         try {
-            const res = await http.get('/routes');
+            const res = await http.get('/routes', {
+                params: {
+                    offset: action.offset,
+                    limit: action.limit
+                }
+            });
             dispatch(ACTIONS.endListRoutes(null, res.data));
         } catch (error) {
             dispatch(ACTIONS.endListRoutes(error));
@@ -25,30 +31,30 @@ export function insertRoute(data) {
     };
 }
 
-export function removeRoute(index) {
+export function removeRoute(id) {
     return async function(dispatch) {
-        dispatch(ACTIONS.beginRemoveRoute(index));
+        dispatch(ACTIONS.beginRemoveRoute(id));
         try {
-            await http.delete(`/routes/${index}`);
-            dispatch(ACTIONS.endRemoveRoute(null, index));
+            await http.delete(`/routes/${id}`);
+            dispatch(ACTIONS.endRemoveRoute(null, id));
         } catch (error) {
             dispatch(ACTIONS.endInsertRoute(error));
         }
     };
 }
 
-export function editRoute(index, enabled) {
+export function editRoute(id, enabled) {
     return function(dispatch) {
-        dispatch(ACTIONS.editRoute(index, enabled));
+        dispatch(ACTIONS.editRoute(id, enabled));
     };
 }
 
-export function updateRoute(index, data) {
+export function updateRoute(id, data) {
     return async function(dispatch) {
-        dispatch(ACTIONS.beginUpdateRoute(index, data));
+        dispatch(ACTIONS.beginUpdateRoute(id, data));
         try {
-            const res = await http.put(`/routes/${index}`, data);
-            dispatch(ACTIONS.endUpdateRoute(null, { index, data: res.data }));
+            const res = await http.put(`/routes/${id}`, data);
+            dispatch(ACTIONS.endUpdateRoute(null, { id, data: res.data }));
         } catch (error) {
             dispatch(ACTIONS.endUpdateRoute(error));
         }

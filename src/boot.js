@@ -4,7 +4,8 @@ module.exports = config => {
         logger.log = () => {};
     }
     const options = require('../client/webpack.config');
-    const db = require('./db');
+    const Database = require('./db');
+    const db = new Database();
     if (config.router.routes) {
         db.load(config.router.routes);
     }

@@ -1,156 +1,244 @@
+const crypto = require('crypto');
+const { EventEmitter } = require('events');
 const symbol = Symbol('db');
 
-module.exports = {
-    [symbol]: Array(),
+function clone(source) {
+    return source == null ? source : JSON.parse(JSON.stringify(source));
+}
 
-    all() {
-        return JSON.parse(JSON.stringify(this[symbol]));
-    },
+function normalize(url) {
+    return url == null
+        ? url
+        : `/${url.replace(/\/$/, '')}`.replace(/\/{2,}/g, '/');
+}
 
-    count() {
-        return this[symbol].length;
-    },
+function hash(method, path) {
+    path = normalize(path);
+    if (!method || !path) {
+        throw new Error('invalid arguments');
+    }
 
-    exists(method, path) {
-        return (
-            typeof method === 'string' &&
-            typeof path === 'string' &&
-            this[symbol].some(
-                doc =>
-                    doc.method.toLowerCase() === method.toLowerCase() &&
-                    doc.path.toLowerCase() === path.toLowerCase()
-            )
-        );
-    },
+    return crypto
+        .createHash('md5')
+        .update(method.toLowerCase() + ' ' + path)
+        .digest('hex');
+}
 
-    existsAt(index) {
-        return this[symbol][index] != null;
-    },
+module.exports = class Database extends EventEmitter {
 
-    find(method, path) {
-        if (typeof method === 'string' && typeof path === 'string') {
-            const doc = this[symbol].find(
-                doc =>
-                    doc.method.toLowerCase() === method.toLowerCase() &&
-                    doc.path.toLowerCase() === path.toLowerCase()
-            );
-            if (doc) {
-                return JSON.parse(JSON.stringify(doc));
+    constructor() {
+        super();
+        this[symbol] = new Map();
+    }
+
+    /**
+     * Get all records
+     */
+    *all() {
+        for (const [id, doc] of this[symbol]) {
+            yield Object.assign({ id }, clone(doc));
+        }
+    }
+
+    /**
+     * Select records with pagination
+     *
+     * @param {number} [offset]
+     * @param {number} [limit]
+     */
+    *select(offset = 0, limit) {
+        let i = 0;
+        if (limit != null) {
+            limit += offset;
+        }
+        for (const [id, doc] of this[symbol]) {
+            if (limit != null && i >= limit) {
+                break;
             }
+            if (i++ < offset) {
+                continue;
+            }
+            yield Object.assign({ id }, clone(doc));
         }
-    },
+    }
 
-    findAt(index) {
-        const doc = this[symbol][index];
+    /**
+     * Get records count
+     *
+     * @returns {number}
+     */
+    count() {
+        return this[symbol].size;
+    }
+
+    /**
+     * Check if an id exists
+     *
+     * @param {string} id
+     * @returns {boolean}
+     */
+    has(id) {
+        return this[symbol].has(id);
+    }
+
+    /**
+     * Check if a composite key exists
+     *
+     * @param {string} method
+     * @param {string} path
+     * @returns {boolean}
+     */
+    exists(method, path) {
+        const id = hash(method, path);
+
+        return this[symbol].has(id);
+    }
+
+    /**
+     * Find a record by id
+     *
+     * @param {string} id
+     */
+    find(id) {
+        const doc = this[symbol].get(id);
         if (doc) {
-            return JSON.parse(JSON.stringify(doc));
+            return Object.assign({ id }, clone(doc));
         }
-    },
+    }
 
-    insert(route) {
-        if (
-            !route ||
-            typeof route.method !== 'string' ||
-            typeof route.path !== 'string' ||
-            this.exist(route.method, route.path)
-        ) {
-            return;
-        }
-        const plain = JSON.stringify(route);
-        this[symbol].push(JSON.parse(plain));
+    /**
+     * Insert a record
+     *
+     * @param {any} doc
+     */
+    insert(doc) {
+        const { method, path } = doc || {};
+        const id = hash(method, path);
+        doc = clone(doc);
+        this[symbol].set(id, doc);
 
-        return JSON.parse(plain);
-    },
+        return Object.assign({ id }, clone(doc));
+    }
 
-    update(route) {
-        if (
-            !route ||
-            typeof route.method !== 'string' ||
-            typeof route.path !== 'string'
-        ) {
-            return;
-        }
-        const doc = this[symbol].find(
-            doc =>
-                doc.method.toLowerCase() === route.method.toLowerCase() &&
-                doc.path.toLowerCase() === route.path.toLowerCase()
-        );
+    /**
+     * Update a record by id
+     *
+     * @param {string} id
+     * @param {any} data
+     */
+    update(id, data) {
+        const doc = this[symbol].get(id);
         if (!doc) {
             return;
         }
-        Object.assign(doc, JSON.parse(JSON.stringify(route)));
-
-        return JSON.parse(JSON.stringify(doc));
-    },
-
-    updateAt(index, data) {
-        const doc = this[symbol][index];
-        if (!doc) {
-            return;
-        }
-        data = JSON.parse(JSON.stringify(data));
+        data = clone(data);
         delete data.method;
         delete data.path;
         Object.assign(doc, data);
 
-        return JSON.parse(JSON.stringify(doc));
-    },
-
-    remove(method, path) {
-        if (typeof method !== 'string' && typeof path !== 'string') {
-            return false;
-        }
-        const index = this[symbol].findIndex(
-            doc =>
-                doc.method.toLowerCase() === method.toLowerCase() &&
-                doc.path.toLowerCase() === path.toLowerCase()
-        );
-        if (index < 0) {
-            return false;
-        }
-        this[symbol].splice(index, 1);
-
-        return true;
-    },
-
-    removeAt(index) {
-        return this[symbol].splice(index, 1).length > 0;
-    },
-
-    move(index, to) {
-        this[symbol].splice(to, 0, ...this[symbol].splice(index, 1));
-    },
-
-    drop() {
-        this[symbol].splice(0);
-    },
-
-    dump() {
-        return this.all().reduce((t, c) => {
-            const key = `${c.method.toUpperCase()} ${c.path}`;
-            delete c.method;
-            delete c.path;
-
-            return Object.assign(t, { [key]: c });
-        }, {});
-    },
-
-    load(routes) {
-        routes = JSON.parse(JSON.stringify(routes));
-        this[symbol].splice(
-            0,
-            this[symbol].length,
-            ...Object.entries(routes).map(([k, v]) => {
-                const [method, path] = k.split(/\s+/, 2);
-
-                return Object.assign(
-                    {
-                        method: method.toLowerCase(),
-                        path
-                    },
-                    v
-                );
-            })
-        );
+        return Object.assign({ id }, clone(doc));
     }
+
+    /**
+     * Delete a record by id
+     *
+     * @param {string} id
+     * @returns {boolean}
+     */
+    remove(id) {
+        return this[symbol].delete(id);
+    }
+
+    /**
+     * Clear all records
+     */
+    drop() {
+        this[symbol].clear();
+    }
+
+    /**
+     * Dump all records to a writable stream in json format
+     *
+     * @param {WritableStream} stream
+     * @returns {Promise<void>}
+     */
+    dump(stream) {
+        return new Promise((resolve, reject) => {
+            let i = 0;
+            for (const [, doc] of this[symbol]) {
+                if (i === 0) {
+                    stream.write('{');
+                } else {
+                    stream.write(',');
+                }
+                const key = `${doc.method.toUpperCase()} ${doc.path}`;
+                const item = clone(doc);
+                delete item.method;
+                delete item.path;
+                stream.write(`"${key}":${JSON.stringify(item)}`);
+                i++;
+            }
+            if (i > 0) {
+                stream.write('}');
+            }
+            stream.end();
+            stream.on('finish', () => resolve());
+            stream.on('error', error => reject(error));
+        });
+    }
+
+    /**
+     * Dump all records to a writable stream in yaml format
+     *
+     * @param {WritableStream} stream
+     * @returns {Promise<void>}
+     */
+    ydump(stream) {
+        const yaml = require('js-yaml');
+
+        return new Promise((resolve, reject) => {
+            for (const [, doc] of this[symbol]) {
+                const key = `${doc.method.toUpperCase()} ${doc.path}`;
+                const item = clone(doc);
+                delete item.method;
+                delete item.path;
+                const text = yaml
+                    .safeDump(item)
+                    .split('\n')
+                    .filter(line => !!line)
+                    .map(line => '  ' + line)
+                    .join('\n');
+                stream.write(`${key}:\n${text}\n`);
+            }
+            stream.end();
+            stream.on('finish', () => resolve());
+            stream.on('error', error => reject(error));
+        });
+    }
+
+    /**
+     * Load records from object
+     *
+     * @param {{[k: string]: any}} data
+     */
+    load(data) {
+        const docs = Object.entries(data).map(([k, v]) => {
+            const [method, path] = k.split(/\s+/, 2);
+
+            return Object.assign(
+                {
+                    method: method.toLowerCase(),
+                    path
+                },
+                v
+            );
+        });
+        const ids = docs.map(doc => hash(doc.method, doc.path));
+        if (new Set(ids).size !== docs.length) {
+            throw new Error('duplicate keys found');
+        }
+        this[symbol].clear();
+        docs.forEach((doc, i) => this[symbol].set(ids[i], doc));
+    }
+
 };

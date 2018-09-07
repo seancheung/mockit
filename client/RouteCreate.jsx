@@ -42,6 +42,7 @@ class RouteCreate extends React.Component {
                         select
                         label="Method"
                         margin="normal"
+                        required
                         SelectProps={{
                             MenuProps: {
                                 className: this.props.classes.menu
@@ -62,6 +63,7 @@ class RouteCreate extends React.Component {
                         margin="dense"
                         label="Path"
                         fullWidth
+                        required
                         value={this.state.path}
                         onChange={this.handleChange.bind(this)}
                     />
