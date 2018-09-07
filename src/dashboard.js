@@ -32,6 +32,15 @@ module.exports = (app, config, db, target, options) => {
     );
     dashboard.use(express.static(path.resolve(__dirname, '../client/public')));
 
+    dashboard.head('/routes', (req, res, next) => {
+        try {
+            const success = db.exists(req.query.method, req.query.path);
+            res.status(success ? 200 : 404).end();
+        } catch (error) {
+            next(error);
+        }
+    });
+
     dashboard.get('/routes', (req, res, next) => {
         try {
             const offset = req.query.offset ? parseInt(req.query.offset) : 0;
@@ -87,6 +96,15 @@ module.exports = (app, config, db, target, options) => {
             }
             target.reload();
             res.status(201).end();
+        } catch (error) {
+            next(error);
+        }
+    });
+
+    dashboard.head('/routes/:id', (req, res, next) => {
+        try {
+            const success = db.has(req.params.id);
+            res.status(success ? 200 : 404).end();
         } catch (error) {
             next(error);
         }
