@@ -1,16 +1,18 @@
 import React from 'react';
+import Header from './Header';
+import Footer from './Footer';
 import RouteList from './RouteList';
-import Top from './Top';
 import 'typeface-roboto';
 
 export default class App extends React.Component {
 
     render() {
         return (
-            <div>
-                <Top />
+            <React.Fragment>
+                <Header />
                 <RouteList />
-            </div>
+                <Footer />
+            </React.Fragment>
         );
     }
 

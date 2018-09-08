@@ -6,7 +6,7 @@ const http = axios.create({
 
 export default http;
 
-export function listRoutes(offset, limit) {
+export function getRoutes(offset, limit) {
     return http.get('/routes', {
         params: {
             offset,
@@ -15,11 +15,11 @@ export function listRoutes(offset, limit) {
     });
 }
 
-export function insertRoute(data) {
+export function addRoute(data) {
     return http.post('/routes', data);
 }
 
-export function removeRoute(id) {
+export function deleteRoute(id) {
     return http.delete(`/routes/${id}`);
 }
 
@@ -27,11 +27,11 @@ export function updateRoute(id, data) {
     return http.put(`/routes/${id}`, data);
 }
 
-export function dumpRoutes() {
+export function exportRoutes() {
     return http.get('/export');
 }
 
-export function loadRoutes(data) {
+export function importRoutes(data) {
     return http.post('/import', data);
 }
 

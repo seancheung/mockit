@@ -8,7 +8,9 @@ export function app(
         size: 10,
         pages: 0,
         count: 0,
-        template: null
+        template: null,
+        mode: null,
+        selected: null
     },
     action
 ) {
@@ -27,14 +29,18 @@ export function app(
     switch (action.type) {
     case ACTIONS.GET_TEMPLATE:
         return Object.assign({}, state, { template: action.data });
-    case ACTIONS.LIST_ROUTES: {
+    case ACTIONS.GET_ROUTES:
         return Object.assign({}, state, {
             index: action.index,
             size: action.size,
             pages: action.pages,
             count: action.count
         });
-    }
+    case ACTIONS.SET_MODE:
+        return Object.assign({}, state, {
+            mode: action.mode,
+            selected: action.selected
+        });
     default:
         return state;
     }
@@ -48,14 +54,12 @@ export function routes(state = [], action) {
     case ACTIONS.IMPORT_ROUTES:
         // TODO:
         return state;
-    case ACTIONS.LIST_ROUTES:
+    case ACTIONS.GET_ROUTES:
         return action.data;
-    case ACTIONS.INSERT_ROUTE:
-        // return [...state, action.data];
+    case ACTIONS.ADD_ROUTE:
         // NOTE: pagination support
         return state;
-    case ACTIONS.REMOVE_ROUTE:
-        // return state.filter(data => data.id !== action.id);
+    case ACTIONS.DELETE_ROUTE:
         // NOTE: pagination support
         return state;
     case ACTIONS.UPDATE_ROUTE:
@@ -64,14 +68,6 @@ export function routes(state = [], action) {
                 return Object.assign({}, data, action.data, {
                     edit: false
                 });
-            }
-
-            return data;
-        });
-    case ACTIONS.EDIT_ROUTE:
-        return state.map(data => {
-            if (action.id === data.id) {
-                return Object.assign({}, data, { edit: action.enabled });
             }
 
             return data;
