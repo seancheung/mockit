@@ -1,0 +1,16 @@
+GET /api/v1/account:
+  bypass: false
+  delay: 1000
+  code: 200
+  headers:
+    Content-Type: "application/json"
+    Server: Nginx
+  body: '{"name":"admin"}'
+PUT /api/v1/account:
+  bypass: false
+  delay: 0
+  code: 200
+  headers:
+    Content-Type: "application/json"
+    Server: Nginx
+  body: '{"name":"admin"}'

@@ -49,14 +49,14 @@ function prepare(config, cb) {
     }
 }
 
-function load(filepath) {
+function load(filepath, dir) {
     const path = require('path');
     const fs = require('fs');
     if (!path.isAbsolute(filepath)) {
-        filepath = path.resolve(process.cwd(), filepath);
+        filepath = path.resolve(dir || process.cwd(), filepath);
     }
     if (!fs.existsSync(filepath)) {
-        throw new Error('file does not exist');
+        throw new Error('file does not exist: ' + filepath);
     }
     let config;
     if (/\.json$/i.test(filepath)) {
@@ -64,7 +64,7 @@ function load(filepath) {
     } else if (/\.ya?ml$/i.test(filepath)) {
         config = require('js-yaml').safeLoad(fs.readFileSync(filepath, 'utf8'));
     } else {
-        throw new Error('Unsupported file type');
+        throw new Error('Unsupported file type: ' + filepath);
     }
 
     return config;
@@ -80,15 +80,16 @@ function start() {
             key: ['K'],
             open: ['O']
         },
-        string: ['host', 'cert', 'key', 'template'],
+        string: ['host', 'cert', 'key', 'template', 'routes'],
         number: ['port'],
         boolean: ['ssl', 'http2', 'open', 'verbose']
     };
     const argv = require('yargs-parser')(args, opts);
 
-    let config;
+    let config, dir;
     if (argv._[0]) {
         config = load(argv._[0]);
+        dir = require('path').dirname(argv._[0]);
     } else {
         config = {};
     }
@@ -124,10 +125,14 @@ function start() {
         config.debug = true;
     }
     if (argv.template) {
-        config.dashboard.template = argv.template;
+        config.dashboard.template = load(argv.template);
+    } else if (typeof config.dashboard.template === 'string') {
+        config.dashboard.template = load(config.dashboard.template, dir);
     }
-    if (config.dashboard.template) {
-        config.dashboard.template = load(config.dashboard.template);
+    if (argv.routes) {
+        config.router.routes = load(argv.routes);
+    } else if (typeof config.router.routes === 'string') {
+        config.router.routes = load(config.router.routes, dir);
     }
     prepare(config, () => {
         const server = require('./src/boot')(config);
