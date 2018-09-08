@@ -1,7 +1,7 @@
-import * as commands from './commands';
+import * as actors from './actors';
 
 export default dispatch =>
-    Object.entries(commands).reduce(
+    Object.entries(actors).reduce(
         (t, [k, v]) =>
             Object.assign(t, { [k]: (...args) => dispatch(v(...args)) }),
         {}

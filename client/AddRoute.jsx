@@ -25,8 +25,7 @@ export const Basic = ({
     path,
     changeHandler,
     cancelHandler,
-    contineHandler,
-    canContinue
+    contineHandler
 }) => (
     <React.Fragment>
         <DialogContent>
@@ -74,7 +73,7 @@ export const Basic = ({
             <Button
                 onClick={contineHandler}
                 color="primary"
-                disabled={canContinue}
+                disabled={!method || !path}
             >
                 Continue
             </Button>
@@ -182,22 +181,76 @@ export const Details = ({
 
 export class AddRoute extends React.Component {
 
+    constructor(props) {
+        super(props);
+        this.state = {
+            method: 'GET',
+            path: '',
+            code: 200,
+            bypass: false,
+            delay: 0,
+            headers: {},
+            body: '',
+            validate: false,
+            type: '',
+            encoding: ''
+        };
+    }
+
     render() {
         return (
-            <Dialog aria-labelledby="create-dialog-title">
+            <Dialog
+                aria-labelledby="create-dialog-title"
+                open={this.props.open}
+                onClose={this.handleCancel.bind(this)}
+            >
                 <DialogTitle id="create-dialog-title">
                     Add New Route
                 </DialogTitle>
-                {this.props.basic ? (
-                    <Basic
+                {this.state.validate ? (
+                    <Details
+                        {...this.state}
                         classes={this.props.classes}
                         template={this.props.template}
+                        changeHandler={this.handleChange.bind(this)}
+                        cancelHandler={this.handleCancel.bind(this)}
+                        addHandler={this.handleAdd.bind(this)}
                     />
                 ) : (
-                    <Details classes={this.props.classes} />
+                    <Basic
+                        {...this.state}
+                        classes={this.props.classes}
+                        template={this.props.template}
+                        changeHandler={this.handleChange.bind(this)}
+                        cancelHandler={this.handleCancel.bind(this)}
+                        contineHandler={this.handleContinue.bind(this)}
+                    />
                 )}
             </Dialog>
         );
+    }
+
+    handleChange(e) {
+        this.setState({ [e.target.name]: e.target.value });
+    }
+
+    handleCancel() {
+        this.setState({ validate: false });
+        this.props.closeHandler();
+    }
+
+    async handleContinue() {
+        const success = await this.props.validateHandler(
+            this.state.method,
+            this.state.path
+        );
+        this.setState({ validate: success });
+    }
+
+    async handleAdd() {
+        await this.props.createHandler(this.state);
+        this.setState({ validate: false });
+        this.props.closeHandler();
     }
 
 }

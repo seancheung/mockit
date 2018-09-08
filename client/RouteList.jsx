@@ -1,49 +1,52 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import Route from './Route';
-import dispatcher from './store/dispatcher';
 import { withStyles } from '@material-ui/core/styles';
-import RouteDelete from './RouteDelete';
+import Route from './Route';
+import AddRoute from './AddRoute';
+import DeleteRoute from './DeleteRoute';
+import director from './store/director';
+import { MODES } from './store/consts';
+import { checkRoute } from './store/http';
 
 const styles = theme => ({
-    content: {
+    list: {
         flexGrow: 1,
         padding: theme.spacing.unit * 2,
-        height: '90vh',
+        height: '85vh',
         overflow: 'auto'
     },
     space: theme.mixins.toolbar
 });
 
-class RouteList extends React.Component {
-
-    constructor(props) {
-        super(props);
-        this.state = { selected: null };
-    }
+export class RouteList extends React.Component {
 
     render() {
         return (
-            <div className={this.props.classes.content}>
+            <div className={this.props.classes.list}>
                 <div className={this.props.classes.space} />
-                {this.props.routes.map((data, index) => (
+                {this.props.routes.map((data, i) => (
                     <Route
-                        key={index}
+                        key={i}
                         data={data}
                         template={this.props.app.template}
-                        removeHandler={() =>
-                            this.setState({ selected: data.id })
-                        }
-                        updateHandler={this.props.updateRoute.bind(
-                            this,
+                        updateHandler={this.handleUpdate.bind(this, data.id)}
+                        deleteHandler={this.props.setMode.bind(
+                            null,
+                            MODES.DELETE,
                             data.id
                         )}
-                        editHandler={this.props.editRoute.bind(this, data.id)}
                     />
                 ))}
-                <RouteDelete
-                    open={this.state.selected != null}
-                    closeHandler={() => this.setState({ selected: null })}
+                <AddRoute
+                    open={this.props.app.mode === MODES.ADD}
+                    template={this.props.app.template}
+                    closeHandler={this.props.setMode.bind(null, null)}
+                    validateHandler={this.handleValidate.bind(this)}
+                    createHandler={this.handleCreate.bind(this)}
+                />
+                <DeleteRoute
+                    open={this.props.app.mode === MODES.DELETE}
+                    closeHandler={this.props.setMode.bind(null, null)}
                     deleteHandler={this.handleDelete.bind(this)}
                 />
             </div>
@@ -52,13 +55,35 @@ class RouteList extends React.Component {
 
     componentDidMount() {
         this.props.getTemplate();
-        this.props.listRoutes(this.props.app.index, this.props.app.size);
+        this.handleRefresh();
     }
 
-    async handleDelete() {
-        await this.props.removeRoute(this.state.selected);
-        this.setState({ selected: null });
-        await this.props.listRoutes(this.props.app.index, this.props.app.size);
+    handleRefresh() {
+        this.props.getRoutes(this.props.app.index, this.props.app.size);
+    }
+
+    handleDelete() {
+        this.props
+            .deleteRoute(this.props.app.selected)
+            .then(() => this.handleRefresh());
+    }
+
+    handleUpdate(id, data) {
+        this.props.updateRoute(id, data);
+    }
+
+    async handleValidate(method, path) {
+        try {
+            await checkRoute(method, path);
+
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    handleCreate(data) {
+        this.props.addRoute(data).then(() => this.handleRefresh());
     }
 
 }
@@ -66,6 +91,6 @@ class RouteList extends React.Component {
 export default withStyles(styles)(
     connect(
         state => ({ app: state.app, routes: state.routes }),
-        dispatcher
+        director
     )(RouteList)
 );
