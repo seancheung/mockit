@@ -10,7 +10,6 @@ import { checkRoute } from './store/http';
 
 const styles = theme => ({
     list: {
-        flexGrow: 1,
         padding: theme.spacing.unit * 2,
         height: '85vh',
         overflow: 'auto'

@@ -13,7 +13,8 @@ const styles = theme => ({
     root: {
         display: 'flex',
         justifyContent: 'center',
-        flexWrap: 'wrap',
+        alignItems: 'center',
+        flexWrap: 'nowrap',
         backgroundColor: theme.palette.primary.main,
         position: 'fixed',
         bottom: 0,
@@ -21,8 +22,7 @@ const styles = theme => ({
         right: 0
     },
     actions: {
-        flexShrink: 0,
-        marginLeft: theme.spacing.unit * 2.5
+        flexShrink: 0
     }
 });
 
