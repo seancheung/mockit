@@ -23,9 +23,9 @@ export class RouteList extends React.Component {
         return (
             <div className={this.props.classes.list}>
                 <div className={this.props.classes.space} />
-                {this.props.routes.map((data, i) => (
+                {this.props.routes.map(data => (
                     <Route
-                        key={i}
+                        key={data.id}
                         data={data}
                         template={this.props.app.template}
                         updateHandler={this.handleUpdate.bind(this, data.id)}
@@ -62,9 +62,10 @@ export class RouteList extends React.Component {
     }
 
     handleDelete() {
-        this.props
-            .deleteRoute(this.props.app.selected)
-            .then(() => this.handleRefresh());
+        this.props.deleteRoute(this.props.app.selected).then(() => {
+            this.handleRefresh();
+            this.props.setMode(null);
+        });
     }
 
     handleUpdate(id, data) {
