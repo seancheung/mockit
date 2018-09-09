@@ -133,3 +133,10 @@ export function endGetTemplate(error, data) {
         data
     };
 }
+
+export function setError(error) {
+    return {
+        type: ACTIONS.SET_ERROR,
+        error
+    };
+}

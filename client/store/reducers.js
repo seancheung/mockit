@@ -41,6 +41,10 @@ export function app(
             mode: action.mode,
             selected: action.selected
         });
+    case ACTIONS.SET_ERROR:
+        return Object.assign({}, state, {
+            error: action.error
+        });
     default:
         return state;
     }

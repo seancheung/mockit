@@ -4,6 +4,7 @@ import { withStyles } from '@material-ui/core/styles';
 import Route from './Route';
 import AddRoute from './AddRoute';
 import DeleteRoute from './DeleteRoute';
+import Message from './Message';
 import director from './store/director';
 import { MODES } from './store/consts';
 import { checkRoute } from './store/http';
@@ -20,16 +21,18 @@ const styles = theme => ({
 export class RouteList extends React.Component {
 
     render() {
+        const { classes, app, routes, setMode, setError } = this.props;
+
         return (
-            <div className={this.props.classes.list}>
-                <div className={this.props.classes.space} />
-                {this.props.routes.map(data => (
+            <div className={classes.list}>
+                <div className={classes.space} />
+                {routes.map(data => (
                     <Route
                         key={data.id}
                         data={data}
-                        template={this.props.app.template}
+                        template={app.template}
                         updateHandler={this.handleUpdate.bind(this, data.id)}
-                        deleteHandler={this.props.setMode.bind(
+                        deleteHandler={setMode.bind(
                             null,
                             MODES.DELETE,
                             data.id
@@ -37,16 +40,22 @@ export class RouteList extends React.Component {
                     />
                 ))}
                 <AddRoute
-                    open={this.props.app.mode === MODES.ADD}
-                    template={this.props.app.template}
-                    closeHandler={this.props.setMode.bind(null, null)}
+                    open={app.mode === MODES.ADD}
+                    template={app.template}
+                    closeHandler={setMode.bind(null, null)}
                     validateHandler={this.handleValidate.bind(this)}
                     createHandler={this.handleCreate.bind(this)}
                 />
                 <DeleteRoute
-                    open={this.props.app.mode === MODES.DELETE}
-                    closeHandler={this.props.setMode.bind(null, null)}
+                    open={app.mode === MODES.DELETE}
+                    closeHandler={setMode.bind(null, null)}
                     deleteHandler={this.handleDelete.bind(this)}
+                />
+                <Message
+                    open={app.error != null}
+                    title="Error"
+                    content={app.error && app.error.message}
+                    closeHandler={setError.bind(null, null)}
                 />
             </div>
         );

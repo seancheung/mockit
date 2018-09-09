@@ -91,3 +91,9 @@ export function getTemplate() {
         }
     };
 }
+
+export function setError(error) {
+    return function(dispatch) {
+        dispatch(creators.setError(error));
+    };
+}
