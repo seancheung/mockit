@@ -20,23 +20,30 @@ const styles = theme => ({
         bottom: 0,
         left: 0,
         right: 0
-    },
-    actions: {
-        flexShrink: 0
     }
 });
 
-export class TablePaginationActions extends React.Component {
+const StyledTablePagination = withStyles(
+    theme => ({
+        caption: { color: theme.palette.primary.contrastText },
+        select: { color: theme.palette.primary.contrastText },
+        selectIcon: { color: theme.palette.primary.contrastText }
+    }),
+    TablePagination
+)(TablePagination);
+
+class TablePaginationActions extends React.Component {
 
     render() {
         const { classes, count, page, rowsPerPage } = this.props;
 
         return (
-            <div className={classes.actions}>
+            <div className={classes.root}>
                 <IconButton
                     onClick={this.handleFirstPageButtonClick.bind(this)}
                     disabled={page === 0}
                     aria-label="First Page"
+                    color="inherit"
                 >
                     <FirstPageIcon />
                 </IconButton>
@@ -44,6 +51,7 @@ export class TablePaginationActions extends React.Component {
                     onClick={this.handleBackButtonClick.bind(this)}
                     disabled={page === 0}
                     aria-label="Previous Page"
+                    color="inherit"
                 >
                     <KeyboardArrowLeft />
                 </IconButton>
@@ -51,6 +59,7 @@ export class TablePaginationActions extends React.Component {
                     onClick={this.handleNextButtonClick.bind(this)}
                     disabled={page >= Math.ceil(count / rowsPerPage) - 1}
                     aria-label="Next Page"
+                    color="inherit"
                 >
                     <KeyboardArrowRight />
                 </IconButton>
@@ -58,6 +67,7 @@ export class TablePaginationActions extends React.Component {
                     onClick={this.handleLastPageButtonClick.bind(this)}
                     disabled={page >= Math.ceil(count / rowsPerPage) - 1}
                     aria-label="Last Page"
+                    color="inherit"
                 >
                     <LastPageIcon />
                 </IconButton>
@@ -89,9 +99,13 @@ export class TablePaginationActions extends React.Component {
 
 }
 
+const StyledTablePaginationActions = withStyles(theme => ({
+    root: { flexShrink: 0, color: theme.palette.primary.contrastText }
+}))(TablePaginationActions);
+
 export const Footer = ({ classes, app, getRoutes }) => (
     <div className={classes.root}>
-        <TablePagination
+        <StyledTablePagination
             component="div"
             labelRowsPerPage=""
             count={app.count}
@@ -99,7 +113,7 @@ export const Footer = ({ classes, app, getRoutes }) => (
             page={app.index}
             onChangePage={(e, page) => getRoutes(page, app.size)}
             onChangeRowsPerPage={e => getRoutes(app.index, e.target.value)}
-            ActionsComponent={withStyles(styles)(TablePaginationActions)}
+            ActionsComponent={StyledTablePaginationActions}
         />
     </div>
 );
