@@ -5,7 +5,7 @@ Http API mock for frontend development
 ## Install
 
 ```bash
-npm i -g mockit
+npm i -g @4fun/mockit
 ```
 
 ## Usage
