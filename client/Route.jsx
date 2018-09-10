@@ -3,6 +3,7 @@ import List from '@material-ui/core/List';
 import Zoom from '@material-ui/core/Zoom';
 import Button from '@material-ui/core/Button';
 import Avatar from '@material-ui/core/Avatar';
+import AddIcon from '@material-ui/icons/Add';
 import EditIcon from '@material-ui/icons/Edit';
 import Divider from '@material-ui/core/Divider';
 import CheckIcon from '@material-ui/icons/Check';
@@ -13,6 +14,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import CancelIcon from '@material-ui/icons/Cancel';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
+import IconButton from '@material-ui/core/IconButton';
 import ListItemText from '@material-ui/core/ListItemText';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
@@ -20,10 +22,10 @@ import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpansionPanelActions from '@material-ui/core/ExpansionPanelActions';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
 import AceEditor from 'react-ace';
-import 'brace/mode/json';
-import 'brace/theme/github';
 
 const styles = theme => ({
     details: {
@@ -49,6 +51,9 @@ const styles = theme => ({
     },
     listNested: {
         paddingLeft: theme.spacing.unit * 10
+    },
+    spacing: {
+        marginBottom: theme.spacing.unit * 4
     }
 });
 
@@ -156,11 +161,17 @@ export const Edit = ({
     code,
     delay,
     body,
+    headers,
     expanded,
     transition,
     changeHandler,
     updateHandler,
-    cancelHandler
+    cancelHandler,
+    newHeader,
+    newHeaderChangeHandler,
+    addHeaderHandler,
+    headerChangeHandler,
+    deleteHeaderHandler
 }) => (
     <React.Fragment>
         <ExpansionPanelDetails className={classes.details}>
@@ -169,7 +180,7 @@ export const Edit = ({
                 select
                 label="Status Code"
                 margin="normal"
-                className={classes.field}
+                className={classNames(classes.field, classes.spacing)}
                 SelectProps={{
                     MenuProps: {
                         className: classes.menu
@@ -189,7 +200,7 @@ export const Edit = ({
                 label="Delay(ms)"
                 margin="normal"
                 type="number"
-                className={classes.field}
+                className={classNames(classes.field, classes.spacing)}
                 value={delay}
                 onChange={changeHandler}
             />
@@ -199,6 +210,7 @@ export const Edit = ({
             <AceEditor
                 mode="json"
                 theme="github"
+                className={classes.spacing}
                 showPrintMargin={false}
                 onChange={value =>
                     changeHandler({ target: { name: 'body', value } })
@@ -208,7 +220,59 @@ export const Edit = ({
                 height="300px"
                 width="80%"
             />
-            <Divider inset />
+            <Typography variant="caption" gutterBottom>
+                Headers
+            </Typography>
+            <List disablePadding className={classes.spacing}>
+                <ListItem key={'new'}>
+                    <TextField
+                        label="Key"
+                        value={newHeader.key}
+                        onChange={e =>
+                            newHeaderChangeHandler('key', e.target.value)
+                        }
+                    />
+                    <TextField
+                        label="Value"
+                        value={newHeader.value}
+                        onChange={e =>
+                            newHeaderChangeHandler('value', e.target.value)
+                        }
+                    />
+                    <ListItemSecondaryAction>
+                        <IconButton
+                            aria-label="Add"
+                            onClick={addHeaderHandler}
+                            disabled={
+                                !newHeader.key ||
+                                !newHeader.value ||
+                                headers[newHeader.key] != null
+                            }
+                        >
+                            <AddIcon />
+                        </IconButton>
+                    </ListItemSecondaryAction>
+                </ListItem>
+                {Object.entries(headers).map(([k, v]) => (
+                    <ListItem key={k}>
+                        <TextField
+                            label={k}
+                            value={v}
+                            onChange={e =>
+                                headerChangeHandler(k, e.target.value)
+                            }
+                        />
+                        <ListItemSecondaryAction>
+                            <IconButton
+                                aria-label="Delete"
+                                onClick={deleteHeaderHandler.bind(null, k)}
+                            >
+                                <DeleteIcon />
+                            </IconButton>
+                        </ListItemSecondaryAction>
+                    </ListItem>
+                ))}
+            </List>
         </ExpansionPanelDetails>
         <Divider />
         <ExpansionPanelActions>
@@ -248,7 +312,8 @@ export class Route extends React.Component {
             expanded: false,
             edit: false,
             headersExpanded: false,
-            bodyExpanded: false
+            bodyExpanded: false,
+            newHeader: { key: '', value: '' }
         });
     }
 
@@ -269,9 +334,16 @@ export class Route extends React.Component {
                         {...this.state}
                         expanded={this.state.expanded}
                         transition={transition}
+                        newHeader={this.state.newHeader}
                         changeHandler={this.handleChange.bind(this)}
                         updateHandler={this.handleUpdate.bind(this)}
                         cancelHandler={this.handleCancel.bind(this)}
+                        newHeaderChangeHandler={this.handleNewHeaderChange.bind(
+                            this
+                        )}
+                        addHeaderHandler={this.handleAddNewHeader.bind(this)}
+                        headerChangeHandler={this.handleHeaderChange.bind(this)}
+                        deleteHeaderHandler={this.handleDeleteHeader.bind(this)}
                     />
                 ) : (
                     <View
@@ -320,6 +392,40 @@ export class Route extends React.Component {
 
     handleDelete() {
         this.props.deleteHandler();
+    }
+
+    handleHeaderChange(key, value) {
+        this.setState(state => ({
+            headers: Object.assign({}, state.headers, {
+                [key]: value
+            })
+        }));
+    }
+
+    handleDeleteHeader(key) {
+        this.setState(state => ({
+            headers: Object.entries(state.headers).reduce(
+                (t, [k, v]) => (key === k ? t : Object.assign(t, { [k]: v })),
+                {}
+            )
+        }));
+    }
+
+    handleNewHeaderChange(key, value) {
+        this.setState(state => ({
+            newHeader: Object.assign({}, state.newHeader, {
+                [key]: value
+            })
+        }));
+    }
+
+    handleAddNewHeader() {
+        this.setState(state => ({
+            headers: Object.assign({}, state.headers, {
+                [state.newHeader.key]: state.newHeader.value
+            })
+        }));
+        this.setState({ newHeader: { key: '', value: '' } });
     }
 
 }

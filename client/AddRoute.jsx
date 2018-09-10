@@ -8,6 +8,8 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import { withStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import AceEditor from 'react-ace';
 
 const styles = {
     menu: {
@@ -85,9 +87,9 @@ export const Details = ({
     classes,
     template,
     code,
+    delay,
     type,
     body,
-    encoding,
     changeHandler,
     cancelHandler,
     addHandler
@@ -117,6 +119,15 @@ export const Details = ({
                 ))}
             </TextField>
             <TextField
+                name="delay"
+                label="Delay(ms)"
+                margin="normal"
+                type="number"
+                className={classes.field}
+                value={delay}
+                onChange={changeHandler}
+            />
+            <TextField
                 name="type"
                 select
                 label="Content Type"
@@ -137,35 +148,21 @@ export const Details = ({
                     </MenuItem>
                 ))}
             </TextField>
-            <TextField
-                name="encoding"
-                select
-                label="Encoding"
-                margin="normal"
-                required={false}
-                className={classes.field}
-                SelectProps={{
-                    MenuProps: {
-                        className: classes.menu
-                    }
-                }}
-                value={encoding}
-                onChange={changeHandler}
-            >
-                {template.encodings.map(option => (
-                    <MenuItem key={option} value={option}>
-                        {option}
-                    </MenuItem>
-                ))}
-            </TextField>
-            <TextField
-                name="body"
-                label="Body"
-                className={classes.field}
-                multiline
-                margin="normal"
+            <Typography variant="caption" gutterBottom>
+                Body
+            </Typography>
+            <AceEditor
+                mode="json"
+                theme="github"
+                className={classes.spacing}
+                showPrintMargin={false}
+                onChange={value =>
+                    changeHandler({ target: { name: 'body', value } })
+                }
+                editorProps={{ $blockScrolling: true }}
                 value={body}
-                onChange={changeHandler}
+                height="200px"
+                width="400px"
             />
         </DialogContent>
         <DialogActions>
@@ -192,8 +189,7 @@ export class AddRoute extends React.Component {
             headers: {},
             body: '',
             validate: false,
-            type: '',
-            encoding: ''
+            type: 'application/json'
         };
     }
 
@@ -248,7 +244,11 @@ export class AddRoute extends React.Component {
     }
 
     async handleAdd() {
-        await this.props.createHandler(this.state);
+        await this.props.createHandler(
+            Object.assign({}, this.state, {
+                headers: { 'Content-Type': this.state.type }
+            })
+        );
         this.setState({ validate: false });
         this.props.closeHandler();
     }

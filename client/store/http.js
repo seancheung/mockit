@@ -1,10 +1,21 @@
 import axios from 'axios';
+import { pluck } from './utils';
 
 const http = axios.create({
     baseURL: BASE_URL
 });
 
 export default http;
+
+export const ROUTE_KEYS = [
+    'method',
+    'path',
+    'code',
+    'bypass',
+    'delay',
+    'headers',
+    'body'
+];
 
 export function getRoutes(offset, limit) {
     return http.get('/routes', {
@@ -16,7 +27,7 @@ export function getRoutes(offset, limit) {
 }
 
 export function addRoute(data) {
-    return http.post('/routes', data);
+    return http.post('/routes', pluck(data, ...ROUTE_KEYS));
 }
 
 export function deleteRoute(id) {
@@ -24,7 +35,7 @@ export function deleteRoute(id) {
 }
 
 export function updateRoute(id, data) {
-    return http.put(`/routes/${id}`, data);
+    return http.put(`/routes/${id}`, pluck(data, ...ROUTE_KEYS.slice(2)));
 }
 
 export function exportRoutes() {
