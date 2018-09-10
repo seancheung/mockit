@@ -58,6 +58,7 @@ export class RouteList extends React.Component {
                     open={app.mode === MODES.IMPORT}
                     closeHandler={setMode.bind(null, null)}
                     importHandler={this.handleImport.bind(this)}
+                    errorHandler={setError}
                 />
                 <ExportRoutes
                     open={app.mode === MODES.EXPORT}

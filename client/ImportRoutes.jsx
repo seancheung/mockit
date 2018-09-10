@@ -63,6 +63,7 @@ export class ImportRoutes extends React.Component {
             this.props.importHandler(this.state.file.name, e.target.result);
             this.props.closeHandler();
         };
+        reader.onerror = error => this.props.errorHandler(error);
     }
 
 }
