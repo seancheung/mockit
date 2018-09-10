@@ -10,6 +10,7 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import AceEditor from 'react-ace';
+import { typeToMode } from './store/utils';
 
 const styles = {
     menu: {
@@ -152,7 +153,7 @@ export const Details = ({
                 Body
             </Typography>
             <AceEditor
-                mode="json"
+                mode={typeToMode(type)}
                 theme="github"
                 className={classes.spacing}
                 showPrintMargin={false}
@@ -189,7 +190,8 @@ export class AddRoute extends React.Component {
             headers: {},
             body: '',
             validate: false,
-            type: 'application/json'
+            type: 'application/json',
+            mode: 'json'
         };
     }
 

@@ -26,6 +26,7 @@ import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
 import AceEditor from 'react-ace';
+import { typeToMode } from './store/utils';
 
 const styles = theme => ({
     details: {
@@ -206,7 +207,7 @@ export const Edit = ({
                 Body
             </Typography>
             <AceEditor
-                mode="json"
+                mode={typeToMode(headers['Content-Type'])}
                 theme="github"
                 className={classes.spacing}
                 showPrintMargin={false}
