@@ -9,25 +9,62 @@ import { withStyles } from '@material-ui/core/styles';
 
 const styles = {};
 
-export const ImportRoutes = ({ open, closeHandler, importHandler }) => (
-    <Dialog
-        open={open}
-        onClose={closeHandler}
-        aria-labelledby="import-dialog-title"
-    >
-        <DialogTitle id="import-dialog-title">Import Routes</DialogTitle>
-        <DialogContent>
-            <DialogContentText>Import Routes</DialogContentText>
-        </DialogContent>
-        <DialogActions>
-            <Button onClick={closeHandler} color="primary">
-                Cancel
-            </Button>
-            <Button onClick={importHandler} color="secondary">
-                Import
-            </Button>
-        </DialogActions>
-    </Dialog>
-);
+export class ImportRoutes extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = { file: null };
+    }
+
+    render() {
+        return (
+            <Dialog
+                open={this.props.open}
+                onClose={this.props.closeHandler}
+                aria-labelledby="import-dialog-title"
+            >
+                <DialogTitle id="import-dialog-title">
+                    Import Routes
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        <input
+                            accept="json,yml,yaml"
+                            id="upload-routes-file"
+                            type="file"
+                            onChange={this.handleChange.bind(this)}
+                        />
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={this.props.closeHandler} color="primary">
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={this.handleImport.bind(this)}
+                        color="secondary"
+                        disabled={this.state.file == null}
+                    >
+                        Import
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        );
+    }
+
+    handleChange(e) {
+        this.setState({ file: e.target.files[0] });
+    }
+
+    handleImport() {
+        const reader = new FileReader();
+        reader.readAsText(this.state.file, 'utf8');
+        reader.onload = e => {
+            this.props.importHandler(this.state.file.name, e.target.result);
+            this.props.closeHandler();
+        };
+    }
+
+}
 
 export default withStyles(styles)(ImportRoutes);

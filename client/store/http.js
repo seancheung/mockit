@@ -46,8 +46,11 @@ export function exportRoutes(type) {
     });
 }
 
-export function importRoutes(data) {
-    return http.post('/import', data);
+export function importRoutes(format, data) {
+    return http.post('/import', {
+        type: format,
+        data
+    });
 }
 
 export function getTemplate() {

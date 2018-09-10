@@ -56,12 +56,12 @@ export function updateRoute(id, data) {
     };
 }
 
-export function importRoutes(data) {
+export function importRoutes(format, data) {
     return async function(dispatch) {
-        dispatch(creators.beginImportRoutes(data));
+        dispatch(creators.beginImportRoutes(format, data));
         try {
-            const res = await http.importRoutes(data);
-            dispatch(creators.endImportRoutes(null, res.data));
+            await http.importRoutes(format, data);
+            dispatch(creators.endImportRoutes(null));
         } catch (error) {
             dispatch(creators.endImportRoutes(error));
         }

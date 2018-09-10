@@ -107,7 +107,9 @@ export class RouteList extends React.Component {
         this.props.addRoute(data).then(() => this.handleRefresh());
     }
 
-    handleImport() {}
+    handleImport(format, data) {
+        this.props.importRoutes(format, data).then(() => this.handleRefresh());
+    }
 
 }
 

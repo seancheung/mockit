@@ -86,19 +86,19 @@ export function endUpdateRoute(error, { id, data } = {}) {
     };
 }
 
-export function beginImportRoutes(data) {
+export function beginImportRoutes(format, data) {
     return {
         type: ACTIONS.IMPORT_ROUTES,
         pending: true,
+        format,
         data
     };
 }
 
-export function endImportRoutes(error, data) {
+export function endImportRoutes(error) {
     return {
         type: ACTIONS.IMPORT_ROUTES,
-        error: error,
-        data
+        error: error
     };
 }
 
