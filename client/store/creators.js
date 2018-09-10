@@ -86,22 +86,6 @@ export function endUpdateRoute(error, { id, data } = {}) {
     };
 }
 
-export function beginExportRoutes() {
-    return {
-        type: ACTIONS.EXPORT_ROUTES,
-        pending: true,
-        error: null
-    };
-}
-
-export function endExportRoutes(error, data) {
-    return {
-        type: ACTIONS.EXPORT_ROUTES,
-        error: error,
-        data
-    };
-}
-
 export function beginImportRoutes(data) {
     return {
         type: ACTIONS.IMPORT_ROUTES,

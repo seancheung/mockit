@@ -76,9 +76,6 @@ export function routes(state = [], action) {
 
             return data;
         });
-    case ACTIONS.EXPORT_ROUTES:
-        // TODO:
-        return state;
     default:
         return state;
     }

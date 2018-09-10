@@ -56,18 +56,6 @@ export function updateRoute(id, data) {
     };
 }
 
-export function exportRoutes() {
-    return async function(dispatch) {
-        dispatch(creators.beginExportRoutes());
-        try {
-            const res = await http.exportRoutes();
-            dispatch(creators.endExportRoutes(null, res.data));
-        } catch (error) {
-            dispatch(creators.endExportRoutes(error));
-        }
-    };
-}
-
 export function importRoutes(data) {
     return async function(dispatch) {
         dispatch(creators.beginImportRoutes(data));

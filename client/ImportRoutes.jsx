@@ -7,28 +7,27 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import { withStyles } from '@material-ui/core/styles';
 
-const styles = theme => ({
-    content: { minWidth: '300px', color: theme.palette.error.main }
-});
+const styles = {};
 
-export const Message = ({ open, title, content, closeHandler, classes }) => (
+export const ImportRoutes = ({ open, closeHandler, importHandler }) => (
     <Dialog
         open={open}
         onClose={closeHandler}
-        aria-labelledby="message-dialog-title"
+        aria-labelledby="import-dialog-title"
     >
-        <DialogTitle id="message-dialog-title">{title}</DialogTitle>
+        <DialogTitle id="import-dialog-title">Import Routes</DialogTitle>
         <DialogContent>
-            <DialogContentText className={classes.content}>
-                {content}
-            </DialogContentText>
+            <DialogContentText>Import Routes</DialogContentText>
         </DialogContent>
         <DialogActions>
             <Button onClick={closeHandler} color="primary">
-                OK
+                Cancel
+            </Button>
+            <Button onClick={importHandler} color="secondary">
+                Import
             </Button>
         </DialogActions>
     </Dialog>
 );
 
-export default withStyles(styles)(Message);
+export default withStyles(styles)(ImportRoutes);

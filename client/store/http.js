@@ -38,8 +38,12 @@ export function updateRoute(id, data) {
     return http.put(`/routes/${id}`, pluck(data, ...ROUTE_KEYS.slice(2)));
 }
 
-export function exportRoutes() {
-    return http.get('/export');
+export function exportRoutes(type) {
+    return http.get('/export', {
+        headers: {
+            accept: type
+        }
+    });
 }
 
 export function importRoutes(data) {

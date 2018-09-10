@@ -4,6 +4,8 @@ import { withStyles } from '@material-ui/core/styles';
 import Route from './Route';
 import AddRoute from './AddRoute';
 import DeleteRoute from './DeleteRoute';
+import ImportRoutes from './ImportRoutes';
+import ExportRoutes from './ExportRoutes';
 import Message from './Message';
 import director from './store/director';
 import { MODES } from './store/consts';
@@ -52,6 +54,15 @@ export class RouteList extends React.Component {
                     closeHandler={setMode.bind(null, null)}
                     deleteHandler={this.handleDelete.bind(this)}
                 />
+                <ImportRoutes
+                    open={app.mode === MODES.IMPORT}
+                    closeHandler={setMode.bind(null, null)}
+                    importHandler={this.handleImport.bind(this)}
+                />
+                <ExportRoutes
+                    open={app.mode === MODES.EXPORT}
+                    closeHandler={setMode.bind(null, null)}
+                />
                 <Message
                     open={app.error != null}
                     title="Error"
@@ -95,6 +106,8 @@ export class RouteList extends React.Component {
     handleCreate(data) {
         this.props.addRoute(data).then(() => this.handleRefresh());
     }
+
+    handleImport() {}
 
 }
 
