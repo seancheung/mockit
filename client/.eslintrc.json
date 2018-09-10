@@ -13,9 +13,6 @@
             "jsx": true
         }
     },
-    "globals": {
-        "BASE_URL": true
-    },
     "rules": {
         "indent": ["warn", 4],
         "quotes": ["error", "single"],

@@ -1,36 +1,9 @@
 const path = require('path');
 const express = require('express');
-const webpack = require('webpack');
-const middleware = require('webpack-dev-middleware');
 
-module.exports = (app, config, db, target, options) => {
-    let baseUrl;
-    if (config.baseUrl) {
-        baseUrl = (config.baseUrl + '/').replace(/\/{2,}/g, '/');
-    } else {
-        baseUrl = '/';
-    }
+module.exports = (app, config, db, target) => {
     const dashboard = express.Router({ mergeParams: true });
-    const compiler = webpack(
-        Object.assign({}, options, {
-            output: Object.assign({}, options.output, {
-                publicPath: baseUrl
-            }),
-            plugins: [
-                new webpack.DefinePlugin({
-                    BASE_URL: JSON.stringify(baseUrl.replace(/\/$/, '')) || '/'
-                })
-            ]
-        })
-    );
-
-    dashboard.use(
-        middleware(compiler, {
-            publicPath: '/',
-            logLevel: 'error'
-        })
-    );
-    dashboard.use(express.static(path.resolve(__dirname, '../client/public')));
+    dashboard.use(express.static(path.resolve(__dirname, '../client/www')));
 
     dashboard.head('/routes', (req, res, next) => {
         try {

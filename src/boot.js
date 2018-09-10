@@ -3,7 +3,6 @@ module.exports = config => {
     if (!config.debug) {
         logger.log = () => {};
     }
-    const options = require('../client/webpack.config');
     const Database = require('./db');
     const db = new Database();
     if (config.router.persist) {
@@ -28,7 +27,7 @@ module.exports = config => {
             target.reload();
         });
     }
-    require('./dashboard')(app, config.dashboard, db, target, options);
+    require('./dashboard')(app, config.dashboard, db, target);
     require('./handler')(app);
 
     let server;

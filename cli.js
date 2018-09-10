@@ -149,10 +149,6 @@ function start() {
         config.router.__routes = resolve(config.router.routes, dir);
         config.router.routes = load(config.router.routes, dir);
     }
-    if (!config.router.routes) {
-        config.router.__routes = resolve('routes.yml', __dirname);
-        config.router.routes = load('routes.yml', __dirname);
-    }
     if (argv.watch && config.router.__routes) {
         config.router.watcher = require('chokidar')
             .watch(config.router.__routes)

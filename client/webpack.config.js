@@ -1,13 +1,15 @@
 const path = require('path');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = {
     entry: {
         main: path.resolve(__dirname, './index.jsx')
     },
-    mode: 'development',
     output: {
         filename: '[name].js',
-        publicPath: '/'
+        path: path.resolve(__dirname, 'www')
     },
     module: {
         rules: [
@@ -37,5 +39,29 @@ module.exports = {
     },
     resolveLoader: {
         modules: [path.join(__dirname, '../node_modules')]
-    }
+    },
+    optimization: {
+        splitChunks: {
+            cacheGroups: {
+                vendors: {
+                    test: /[\\/]node_modules[\\/]/,
+                    name: 'vendors',
+                    chunks: 'all'
+                }
+            }
+        }
+    },
+    plugins: [
+        new CleanWebpackPlugin(['www/*'], {
+            root: __dirname,
+            exclude: ['.gitignore']
+        }),
+        new HtmlWebpackPlugin({
+            template: path.resolve(__dirname, './index.html')
+        }),
+        new UglifyJsPlugin({
+            parallel: true,
+            extractComments: true
+        })
+    ]
 };

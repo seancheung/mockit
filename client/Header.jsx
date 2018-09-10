@@ -12,7 +12,7 @@ import purple from '@material-ui/core/colors/purple';
 import green from '@material-ui/core/colors/green';
 import cyan from '@material-ui/core/colors/cyan';
 import grey from '@material-ui/core/colors/grey';
-import { withStyles } from '@material-ui/core/styles';
+import withStyles from '@material-ui/core/styles/withStyles';
 import director from './store/director';
 import { MODES } from './store/consts';
 

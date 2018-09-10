@@ -2,7 +2,7 @@ import axios from 'axios';
 import { pluck } from './utils';
 
 const http = axios.create({
-    baseURL: BASE_URL
+    baseURL: window.location.pathname
 });
 
 export default http;

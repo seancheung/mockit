@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { withStyles } from '@material-ui/core/styles';
+import withStyles from '@material-ui/core/styles/withStyles';
 import Route from './Route';
 import AddRoute from './AddRoute';
 import DeleteRoute from './DeleteRoute';
