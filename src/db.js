@@ -1,6 +1,9 @@
 const crypto = require('crypto');
 const { EventEmitter } = require('events');
-const symbol = Symbol('db');
+const SYMBOLS = {
+    db: Symbol(),
+    stream: Symbol()
+};
 
 function clone(source) {
     return source == null ? source : JSON.parse(JSON.stringify(source));
@@ -28,14 +31,14 @@ module.exports = class Database extends EventEmitter {
 
     constructor() {
         super();
-        this[symbol] = new Map();
+        this[SYMBOLS.db] = new Map();
     }
 
     /**
      * Get all records
      */
     *all() {
-        for (const [id, doc] of this[symbol]) {
+        for (const [id, doc] of this[SYMBOLS.db]) {
             yield Object.assign({ id }, clone(doc));
         }
     }
@@ -51,7 +54,7 @@ module.exports = class Database extends EventEmitter {
         if (limit != null) {
             limit += offset;
         }
-        for (const [id, doc] of this[symbol]) {
+        for (const [id, doc] of this[SYMBOLS.db]) {
             if (limit != null && i >= limit) {
                 break;
             }
@@ -68,7 +71,7 @@ module.exports = class Database extends EventEmitter {
      * @returns {number}
      */
     count() {
-        return this[symbol].size;
+        return this[SYMBOLS.db].size;
     }
 
     /**
@@ -78,7 +81,7 @@ module.exports = class Database extends EventEmitter {
      * @returns {boolean}
      */
     has(id) {
-        return this[symbol].has(id);
+        return this[SYMBOLS.db].has(id);
     }
 
     /**
@@ -91,7 +94,7 @@ module.exports = class Database extends EventEmitter {
     exists(method, path) {
         const id = hash(method, path);
 
-        return this[symbol].has(id);
+        return this[SYMBOLS.db].has(id);
     }
 
     /**
@@ -100,7 +103,7 @@ module.exports = class Database extends EventEmitter {
      * @param {string} id
      */
     find(id) {
-        const doc = this[symbol].get(id);
+        const doc = this[SYMBOLS.db].get(id);
         if (doc) {
             return Object.assign({ id }, clone(doc));
         }
@@ -115,7 +118,10 @@ module.exports = class Database extends EventEmitter {
         const { method, path } = doc || {};
         const id = hash(method, path);
         doc = clone(doc);
-        this[symbol].set(id, doc);
+        this[SYMBOLS.db].set(id, doc);
+        if (this[SYMBOLS.stream]) {
+            this.ydump(this[SYMBOLS.stream]);
+        }
 
         return Object.assign({ id }, clone(doc));
     }
@@ -127,7 +133,7 @@ module.exports = class Database extends EventEmitter {
      * @param {any} data
      */
     update(id, data) {
-        const doc = this[symbol].get(id);
+        const doc = this[SYMBOLS.db].get(id);
         if (!doc) {
             return;
         }
@@ -135,6 +141,9 @@ module.exports = class Database extends EventEmitter {
         delete data.method;
         delete data.path;
         Object.assign(doc, data);
+        if (this[SYMBOLS.stream]) {
+            this.ydump(this[SYMBOLS.stream]);
+        }
 
         return Object.assign({ id }, clone(doc));
     }
@@ -146,14 +155,22 @@ module.exports = class Database extends EventEmitter {
      * @returns {boolean}
      */
     remove(id) {
-        return this[symbol].delete(id);
+        const sucess = this[SYMBOLS.db].delete(id);
+        if (this[SYMBOLS.stream]) {
+            this.ydump(this[SYMBOLS.stream]);
+        }
+
+        return sucess;
     }
 
     /**
      * Clear all records
      */
     drop() {
-        this[symbol].clear();
+        this[SYMBOLS.db].clear();
+        if (this[SYMBOLS.stream]) {
+            this.ydump(this[SYMBOLS.stream]);
+        }
     }
 
     /**
@@ -165,7 +182,7 @@ module.exports = class Database extends EventEmitter {
     dump(stream) {
         return new Promise((resolve, reject) => {
             let i = 0;
-            for (const [, doc] of this[symbol]) {
+            for (const [, doc] of this[SYMBOLS.db]) {
                 if (i === 0) {
                     stream.write('{');
                 } else {
@@ -197,7 +214,7 @@ module.exports = class Database extends EventEmitter {
         const yaml = require('js-yaml');
 
         return new Promise((resolve, reject) => {
-            for (const [, doc] of this[symbol]) {
+            for (const [, doc] of this[SYMBOLS.db]) {
                 const key = `${doc.method.toUpperCase()} ${doc.path}`;
                 const item = clone(doc);
                 delete item.method;
@@ -237,8 +254,15 @@ module.exports = class Database extends EventEmitter {
         if (new Set(ids).size !== docs.length) {
             throw new Error('duplicate keys found');
         }
-        this[symbol].clear();
-        docs.forEach((doc, i) => this[symbol].set(ids[i], doc));
+        this[SYMBOLS.db].clear();
+        docs.forEach((doc, i) => this[SYMBOLS.db].set(ids[i], doc));
+        if (this[SYMBOLS.stream]) {
+            this.ydump(this[SYMBOLS.stream]);
+        }
+    }
+
+    persist(stream) {
+        this[SYMBOLS.stream] = stream;
     }
 
 };

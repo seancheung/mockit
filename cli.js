@@ -49,7 +49,7 @@ function prepare(config, cb) {
     }
 }
 
-function load(filepath, dir) {
+function resolve(filepath, dir) {
     const path = require('path');
     const fs = require('fs');
     if (!path.isAbsolute(filepath)) {
@@ -58,6 +58,13 @@ function load(filepath, dir) {
     if (!fs.existsSync(filepath)) {
         throw new Error('file does not exist: ' + filepath);
     }
+
+    return filepath;
+}
+
+function load(filepath, dir) {
+    const fs = require('fs');
+    filepath = resolve(filepath, dir);
     let config;
     if (/\.json$/i.test(filepath)) {
         config = JSON.parse(fs.readFileSync(filepath, 'utf8'));
@@ -80,9 +87,9 @@ function start() {
             key: ['K'],
             open: ['O']
         },
-        string: ['host', 'cert', 'key', 'template', 'routes'],
+        string: ['host', 'cert', 'key', 'template', 'routes', 'persist'],
         number: ['port'],
-        boolean: ['ssl', 'http2', 'open', 'verbose']
+        boolean: ['ssl', 'http2', 'open', 'verbose', 'watch']
     };
     const argv = require('yargs-parser')(args, opts);
 
@@ -125,14 +132,37 @@ function start() {
         config.debug = true;
     }
     if (argv.template) {
-        config.dashboard.template = load(argv.template);
+        config.dashboard.template = load(argv.template, dir);
     } else if (typeof config.dashboard.template === 'string') {
         config.dashboard.template = load(config.dashboard.template, dir);
     }
     if (argv.routes) {
-        config.router.routes = load(argv.routes);
+        config.router.__routes = resolve(argv.routes, dir);
+        config.router.routes = load(argv.routes, dir);
     } else if (typeof config.router.routes === 'string') {
+        config.router.__routes = resolve(config.router.routes, dir);
         config.router.routes = load(config.router.routes, dir);
+    }
+    if (argv.watch && config.router.__routes) {
+        config.router.watcher = require('chokidar')
+            .watch(config.router.__routes)
+            .on('change', function(filename) {
+                console.log('file changed: %s', filename);
+                const routes = load(filename);
+                this.emit('reloaded', routes);
+            })
+            .on('unlink', function(filename) {
+                console.log('file removed: %s', filename);
+                this.emit('reloaded');
+            })
+            .on('error', err => console.error(err));
+    }
+    if (argv.persist) {
+        config.router.persist = require('fs').createWriteStream(argv.persist);
+    } else if (typeof config.router.persist === 'string') {
+        config.router.persist = require('fs').createWriteStream(
+            config.router.persist
+        );
     }
     prepare(config, () => {
         const server = require('./src/boot')(config);
@@ -200,7 +230,10 @@ function help() {
     console.log('   -P, --port=<port>       port number');
     console.log('   -S, --ssl               enable https');
     console.log('       --http2             enable http2');
-    console.log('       --template=<path>   template path');
+    console.log('       --template=<path>   template file path');
+    console.log('       --routes=<path>     routes file path');
+    console.log('       --watch             enable routes file watch');
+    console.log('       --persist=<path>    dump file path');
     console.log('   -C, --cert=<path>       ssl cert file path');
     console.log('   -K, --key=<path>        ssl key file path');
     console.log('   -O, --open              open browser');

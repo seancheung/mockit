@@ -6,6 +6,9 @@ module.exports = config => {
     const options = require('../client/webpack.config');
     const Database = require('./db');
     const db = new Database();
+    if (config.router.persist) {
+        db.persist(config.router.persist);
+    }
     if (config.router.routes) {
         db.load(config.router.routes);
     }
@@ -15,6 +18,16 @@ module.exports = config => {
     }
     const target = require('./router')(app, config.router, db);
     target.reload();
+    if (config.router.watcher) {
+        config.router.watcher.on('reloaded', routes => {
+            if (routes) {
+                db.load(routes);
+            } else {
+                db.drop();
+            }
+            target.reload();
+        });
+    }
     require('./dashboard')(app, config.dashboard, db, target, options);
     require('./handler')(app);
 
