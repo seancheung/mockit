@@ -19,7 +19,8 @@ const styles = theme => ({
         position: 'fixed',
         bottom: 0,
         left: 0,
-        right: 0
+        right: 0,
+        zIndex: theme.zIndex.appBar
     }
 });
 
