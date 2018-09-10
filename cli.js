@@ -113,6 +113,9 @@ function start() {
     if (argv.host) {
         config.host = argv.host;
     }
+    if (!config.host) {
+        config.host = '0.0.0.0';
+    }
     if (argv.port) {
         config.port = argv.port;
     }
@@ -136,12 +139,19 @@ function start() {
     } else if (typeof config.dashboard.template === 'string') {
         config.dashboard.template = load(config.dashboard.template, dir);
     }
+    if (!config.dashboard.template) {
+        config.dashboard.template = load('template.yml', __dirname);
+    }
     if (argv.routes) {
         config.router.__routes = resolve(argv.routes, dir);
         config.router.routes = load(argv.routes, dir);
     } else if (typeof config.router.routes === 'string') {
         config.router.__routes = resolve(config.router.routes, dir);
         config.router.routes = load(config.router.routes, dir);
+    }
+    if (!config.router.routes) {
+        config.router.__routes = resolve('routes.yml', __dirname);
+        config.router.routes = load('routes.yml', __dirname);
     }
     if (argv.watch && config.router.__routes) {
         config.router.watcher = require('chokidar')

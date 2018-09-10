@@ -4,7 +4,7 @@ GET /api/v1/account:
   code: 200
   headers:
     Content-Type: "application/json"
-    Server: Nginx
+    Server: "Nginx"
   body: '{"name":"admin"}'
 PUT /api/v1/account:
   bypass: false
@@ -12,5 +12,4 @@ PUT /api/v1/account:
   code: 200
   headers:
     Content-Type: "application/json"
-    Server: Nginx
-  body: '{"name":"admin"}'
+    Server: "Nginx"
