@@ -8,6 +8,7 @@ import Message from './Message';
 import director from './store/director';
 import { MODES } from './store/consts';
 import { checkRoute } from './store/http';
+import { pluck } from './store/utils';
 
 const styles = theme => ({
     list: {
@@ -77,8 +78,8 @@ export class RouteList extends React.Component {
         });
     }
 
-    handleUpdate(id, data) {
-        this.props.updateRoute(id, data);
+    handleUpdate(id, data, dirty) {
+        this.props.updateRoute(id, dirty ? pluck(data, ...dirty) : data);
     }
 
     async handleValidate(method, path) {

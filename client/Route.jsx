@@ -176,7 +176,6 @@ export const Edit = ({
     <React.Fragment>
         <ExpansionPanelDetails className={classes.details}>
             <TextField
-                name="code"
                 select
                 label="Status Code"
                 margin="normal"
@@ -187,7 +186,7 @@ export const Edit = ({
                     }
                 }}
                 value={code}
-                onChange={changeHandler}
+                onChange={e => changeHandler('code', e.target.value)}
             >
                 {Object.entries(template.codes).map(([k, v]) => (
                     <MenuItem key={k} value={parseInt(k)}>
@@ -196,13 +195,12 @@ export const Edit = ({
                 ))}
             </TextField>
             <TextField
-                name="delay"
                 label="Delay(ms)"
                 margin="normal"
                 type="number"
                 className={classNames(classes.field, classes.spacing)}
                 value={delay}
-                onChange={changeHandler}
+                onChange={e => changeHandler('delay', e.target.value)}
             />
             <Typography variant="caption" gutterBottom>
                 Body
@@ -212,9 +210,7 @@ export const Edit = ({
                 theme="github"
                 className={classes.spacing}
                 showPrintMargin={false}
-                onChange={value =>
-                    changeHandler({ target: { name: 'body', value } })
-                }
+                onChange={value => changeHandler('body', value)}
                 editorProps={{ $blockScrolling: true }}
                 value={body}
                 height="300px"
@@ -313,7 +309,8 @@ export class Route extends React.Component {
             edit: false,
             headersExpanded: false,
             bodyExpanded: false,
-            newHeader: { key: '', value: '' }
+            newHeader: { key: '', value: '' },
+            dirty: new Set()
         });
     }
 
@@ -377,8 +374,11 @@ export class Route extends React.Component {
         this.setState({ edit: true });
     }
 
-    handleChange(e) {
-        this.setState({ [e.target.name]: e.target.value });
+    handleChange(key, value) {
+        this.setState(state => ({
+            [key]: value,
+            dirty: new Set(state.dirty).add(key)
+        }));
     }
 
     handleCancel() {
@@ -386,7 +386,10 @@ export class Route extends React.Component {
     }
 
     async handleUpdate() {
-        await this.props.updateHandler(this.state);
+        await this.props.updateHandler(
+            this.state,
+            Array.from(this.state.dirty)
+        );
         this.setState({ edit: false });
     }
 
@@ -398,7 +401,8 @@ export class Route extends React.Component {
         this.setState(state => ({
             headers: Object.assign({}, state.headers, {
                 [key]: value
-            })
+            }),
+            dirty: new Set(state.dirty).add('headers')
         }));
     }
 
@@ -407,7 +411,8 @@ export class Route extends React.Component {
             headers: Object.entries(state.headers).reduce(
                 (t, [k, v]) => (key === k ? t : Object.assign(t, { [k]: v })),
                 {}
-            )
+            ),
+            dirty: new Set(state.dirty).add('headers')
         }));
     }
 
@@ -423,9 +428,10 @@ export class Route extends React.Component {
         this.setState(state => ({
             headers: Object.assign({}, state.headers, {
                 [state.newHeader.key]: state.newHeader.value
-            })
+            }),
+            newHeader: { key: '', value: '' },
+            dirty: new Set(state.dirty).add('headers')
         }));
-        this.setState({ newHeader: { key: '', value: '' } });
     }
 
 }
