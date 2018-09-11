@@ -1,0 +1,17 @@
+host: "127.0.0.1"
+port: 0
+http2: false
+ssl:
+  enabled: false
+  cert: "/path/to/cert/file"
+  key: "/path/to/key/file"
+debug: true
+logger:
+  enabled: true
+  type: "combined"
+dashboard:
+  baseUrl: "/dashboard"
+  template: "template.yml"
+router:
+  cors: true
+  routes: "routes.yml"
