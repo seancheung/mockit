@@ -1,4 +1,5 @@
 const logger = require('./logger');
+const request = require('express-request-proxy');
 
 function mount(router, route) {
     router[route.method](route.path, (req, res, next) => {
@@ -7,18 +8,42 @@ function mount(router, route) {
         } else {
             const handler = () => {
                 try {
-                    if (route.code) {
-                        res.status(route.code);
-                    }
-                    if (route.headers) {
-                        Object.entries(route.headers).forEach(([k, v]) =>
-                            res.setHeader(k, v)
-                        );
-                    }
-                    if (route.body != null) {
-                        res.send(route.body);
+                    if (route.proxy) {
+                        const { remote, rewrite, headers } = route.proxy;
+                        let path;
+                        if (rewrite) {
+                            const [match, target] = rewrite.split(/\s+/, 2);
+                            const reg = new RegExp(match).exec(req.originalUrl);
+                            path = target.replace(/\$(\d)/g, (_, i) => reg[i]);
+                        } else {
+                            path = req.originalUrl;
+                        }
+                        if (/\/$/.test(remote) && /^\//.test(path)) {
+                            path = path.replace(/^\//, '');
+                        } else if (!/\/$/.test(remote) && !/^\//.test(path)) {
+                            path = '/' + path;
+                        }
+                        const url = remote + path;
+                        request({
+                            url,
+                            params: req.params,
+                            query: req.query,
+                            headers: Object.assign({}, /*req.headers,*/ headers)
+                        })(req, res, next);
                     } else {
-                        res.end();
+                        if (route.code) {
+                            res.status(route.code);
+                        }
+                        if (route.headers) {
+                            Object.entries(route.headers).forEach(([k, v]) =>
+                                res.setHeader(k, v)
+                            );
+                        }
+                        if (route.body != null) {
+                            res.send(route.body);
+                        } else {
+                            res.end();
+                        }
                     }
                 } catch (error) {
                     next(error);

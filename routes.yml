@@ -13,3 +13,14 @@ PUT /api/v1/account:
   headers:
     Content-Type: "application/json"
     Server: "Nginx"
+ALL /api/v1/proxy/*:
+  proxy:
+    remote: 'https://jsonplaceholder.typicode.com'
+    rewrite: ^/api/v1/proxy/(.*) /posts/$1
+    # headers:
+    #   X-Real-IP: $remote_addr
+    #   X-Forwarded-For: $proxy_add_x_forwarded_for
+    #   X-Mockit-Proxy: true
+    #   Upgrade: $http_upgrade
+    #   Connection: 'upgrade'
+    #   Host: $host

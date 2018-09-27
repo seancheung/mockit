@@ -8,6 +8,7 @@ methods:
   - 'OPTIONS'
   - 'TRACE'
   - 'PATCH'
+  - 'ALL'
 codes:
   "100": "Continue"
   "101": "Switching Protocols"
