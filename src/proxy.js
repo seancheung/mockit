@@ -34,10 +34,15 @@ module.exports = route => (req, res, next) => {
                     (_, i) =>
                         i in vars
                             ? vars[i](req, route.proxy)
-                            : _.replace(/\$http_([\w_]+)/g, (_, j) =>
-                                req.header(j.replace(/_/g, '-'))
+                            : _.replace(
+                                /\$http_([\w_]+)/g,
+                                (_, j) =>
+                                    req.header(j.replace(/_/g, '-')) || ''
                             )
                 );
+                if (!v) {
+                    return t;
+                }
             }
 
             return Object.assign(t, { [k]: v });
