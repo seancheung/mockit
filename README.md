@@ -116,17 +116,17 @@ routes.yml
 ```yaml
 # method and path
 GET /api/v1/account:
-  # bypass(disable) this route
+  # bypass(disable) this route(optional)
   bypass: false
-  # simulate response delay in milliseconds
+  # simulate response delay in milliseconds(optional)
   delay: 1000
   # http status code
   code: 200
-  # response headers
+  # response headers(optional)
   headers:
     Content-Type: "application/json"
     Server: "Nginx"
-  # response body(string)
+  # response body(string)(optional)
   body: '{"name":"admin"}'
 PUT /api/v1/account:
   bypass: false
@@ -135,6 +135,24 @@ PUT /api/v1/account:
   headers:
     Content-Type: "application/json"
     Server: "Nginx"
+# match all methods and sub paths
+ALL /api/v1/proxy/*:
+  # reverse proxy
+  proxy:
+    # proxy remote
+    remote: "https://jsonplaceholder.typicode.com"
+    # rewrite rules in niginx style(optional)
+    rewrite: ^/api/v1/proxy/(.*) /posts/$1
+    # proxy headers(optional)
+    headers:
+      # see Proxy Header Variables for details
+      X-Real-IP: $remote_addr
+      X-Forwarded-For: $proxy_add_x_forwarded_for
+      X-Mockit-Proxy: true
+      Upgrade: $http_upgrade
+      User-Agent: $http_user_agent
+      Connection: "upgrade"
+      Host: $host
 ```
 
 routes.json
@@ -159,6 +177,21 @@ routes.json
       "Content-Type": "application/json",
       "Server": "Nginx"
     }
+  },
+  "ALL /api/v1/proxy/*": {
+    "proxy": {
+      "remote": "https://jsonplaceholder.typicode.com",
+      "rewrite": "^/api/v1/proxy/(.*) /posts/$1",
+      "headers": {
+        "X-Real-IP": "$remote_addr",
+        "X-Forwarded-For": "$proxy_add_x_forwarded_for",
+        "X-Mockit-Proxy": true,
+        "Upgrade": "$http_upgrade",
+        "User-Agent": "$http_user_agent",
+        "Connection": "upgrade",
+        "Host": "$host"
+      }
+    }
   }
 }
 ```
@@ -177,6 +210,8 @@ methods:
   - "OPTIONS"
   - "TRACE"
   - "PATCH"
+  # catch all
+  - "ALL"
 # http status codes and descriptions
 codes:
   "100": "Continue"
@@ -358,3 +393,25 @@ template.json
   ]
 }
 ```
+
+#### Proxy Header Variables
+
+**$host**
+
+Proxy remote host name
+
+**$remote_addr**
+
+Client request IP
+
+**$proxy_add_x_forwarded_for**
+
+Concat client `X-Forwarded-For` header(if exists) with Client IP
+
+**$http_{name}**
+
+Request header field in snakecase
+
+e.g.
+
+`$http_user_agent` returns client header `User-Agent`
