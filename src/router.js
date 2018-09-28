@@ -1,5 +1,5 @@
 const express = require('express');
-const routing = require('./routing');
+const mount = require('./mount');
 
 module.exports = (app, config, db) => {
     const target = {};
@@ -17,7 +17,7 @@ module.exports = (app, config, db) => {
             });
         }
         for (const doc of db.all()) {
-            routing.mount(router, doc);
+            mount(router, doc);
         }
         target.router = router;
     }
