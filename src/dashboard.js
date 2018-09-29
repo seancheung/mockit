@@ -6,11 +6,14 @@ module.exports = (app, config, db, target, mode) => {
     if (mode === 'production') {
         dashboard.use(express.static(path.resolve(__dirname, '../www')));
     } else {
+        const options = require('../client/webpack.config')(mode);
+        if (config.baseUrl) {
+            options.output.publicPath = config.baseUrl.replace(/\/$/, '') + '/';
+        }
         dashboard.use(
-            require('webpack-dev-middleware')(
-                require('webpack')(require('../client/webpack.config')(mode)),
-                { logLevel: 'error' }
-            )
+            require('webpack-dev-middleware')(require('webpack')(options), {
+                logLevel: 'error'
+            })
         );
     }
 
