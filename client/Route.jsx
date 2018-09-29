@@ -12,6 +12,7 @@ import Collapse from '@material-ui/core/Collapse';
 import MenuItem from '@material-ui/core/MenuItem';
 import DeleteIcon from '@material-ui/icons/Delete';
 import CancelIcon from '@material-ui/icons/Cancel';
+import PublicIcon from '@material-ui/icons/Public';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
@@ -55,6 +56,12 @@ const styles = theme => ({
     },
     spacing: {
         marginBottom: theme.spacing.unit * 4
+    },
+    url: {
+        width: '90%'
+    },
+    flex: {
+        flex: 1
     }
 });
 
@@ -89,21 +96,29 @@ export const View = ({
                     <Avatar>D</Avatar>
                     <ListItemText primary="Delay(ms)" secondary={delay} />
                 </ListItem>
-                <ListItem button onClick={toggleHeadersHandler}>
+                <ListItem
+                    disabled={!headers}
+                    button
+                    onClick={toggleHeadersHandler}
+                >
                     <Avatar>H</Avatar>
                     <ListItemText inset primary="Headers" />
                     {headersExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                 </ListItem>
                 <Collapse in={headersExpanded} timeout="auto" unmountOnExit>
                     <List component="div" disablePadding>
-                        {Object.entries(headers).map(([k, v]) => (
-                            <ListItem key={k} className={classes.listNested}>
-                                <ListItemText primary={k} secondary={v} />
-                            </ListItem>
-                        ))}
+                        {headers &&
+                            Object.entries(headers).map(([k, v]) => (
+                                <ListItem
+                                    key={k}
+                                    className={classes.listNested}
+                                >
+                                    <ListItemText primary={k} secondary={v} />
+                                </ListItem>
+                            ))}
                     </List>
                 </Collapse>
-                <ListItem button onClick={toggleBodyHandler}>
+                <ListItem disabled={!body} button onClick={toggleBodyHandler}>
                     <Avatar>B</Avatar>
                     <ListItemText inset primary="Body" />
                     {bodyExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
@@ -160,9 +175,9 @@ export const Edit = ({
     classes,
     template,
     code,
-    delay,
-    body,
-    headers,
+    delay = '',
+    body = '',
+    headers = {},
     expanded,
     transition,
     changeHandler,
@@ -301,6 +316,209 @@ export const Edit = ({
     </React.Fragment>
 );
 
+export const ProxyView = ({
+    classes,
+    remote,
+    rewrite,
+    headers,
+    expanded,
+    transition,
+    editHandler,
+    deleteHandler,
+    headersExpanded,
+    toggleHeadersHandler
+}) => (
+    <React.Fragment>
+        <ExpansionPanelDetails className={classes.details}>
+            <List>
+                <ListItem>
+                    <Avatar>R</Avatar>
+                    <ListItemText primary="Remote" secondary={remote} />
+                </ListItem>
+                <ListItem>
+                    <Avatar>W</Avatar>
+                    <ListItemText primary="Rewrite" secondary={rewrite} />
+                </ListItem>
+                <ListItem
+                    disabled={!headers}
+                    button
+                    onClick={toggleHeadersHandler}
+                >
+                    <Avatar>H</Avatar>
+                    <ListItemText inset primary="Headers" />
+                    {headersExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                </ListItem>
+                <Collapse in={headersExpanded} timeout="auto" unmountOnExit>
+                    <List component="div" disablePadding>
+                        {headers &&
+                            Object.entries(headers).map(([k, v]) => (
+                                <ListItem
+                                    key={k}
+                                    className={classes.listNested}
+                                >
+                                    <ListItemText primary={k} secondary={v} />
+                                </ListItem>
+                            ))}
+                    </List>
+                </Collapse>
+            </List>
+        </ExpansionPanelDetails>
+        <Divider />
+        <ExpansionPanelActions>
+            <Zoom in={expanded} unmountOnExit timeout={transition}>
+                <Button
+                    className={classes.button}
+                    variant="fab"
+                    mini
+                    color="primary"
+                    aria-label="Edit"
+                    onClick={editHandler.bind(null, true)}
+                >
+                    <EditIcon />
+                </Button>
+            </Zoom>
+            <Zoom in={expanded} unmountOnExit timeout={transition}>
+                <Button
+                    className={classes.button}
+                    variant="fab"
+                    mini
+                    color="secondary"
+                    aria-label="Delete"
+                    onClick={deleteHandler}
+                >
+                    <DeleteIcon />
+                </Button>
+            </Zoom>
+        </ExpansionPanelActions>
+    </React.Fragment>
+);
+
+export const ProxyEdit = ({
+    classes,
+    remote = '',
+    rewrite = '',
+    headers = {},
+    expanded,
+    transition,
+    changeHandler,
+    updateHandler,
+    cancelHandler,
+    newHeader,
+    newHeaderChangeHandler,
+    addHeaderHandler,
+    headerChangeHandler,
+    deleteHeaderHandler
+}) => (
+    <React.Fragment>
+        <ExpansionPanelDetails className={classes.details}>
+            <TextField
+                label="Remote"
+                margin="normal"
+                className={classNames(
+                    classes.field,
+                    classes.spacing,
+                    classes.url
+                )}
+                value={remote}
+                onChange={e => changeHandler('remote', e.target.value)}
+                fullWidth
+            />
+            <TextField
+                label="Rewrite"
+                margin="normal"
+                className={classNames(
+                    classes.field,
+                    classes.spacing,
+                    classes.url
+                )}
+                value={rewrite}
+                onChange={e => changeHandler('rewrite', e.target.value)}
+                fullWidth
+            />
+            <Typography variant="caption" gutterBottom>
+                Headers
+            </Typography>
+            <List disablePadding className={classes.spacing}>
+                <ListItem key={'new'}>
+                    <TextField
+                        label="Key"
+                        value={newHeader.key}
+                        onChange={e =>
+                            newHeaderChangeHandler('key', e.target.value)
+                        }
+                    />
+                    <TextField
+                        label="Value"
+                        value={newHeader.value}
+                        onChange={e =>
+                            newHeaderChangeHandler('value', e.target.value)
+                        }
+                    />
+                    <ListItemSecondaryAction>
+                        <IconButton
+                            aria-label="Add"
+                            onClick={addHeaderHandler}
+                            disabled={
+                                !newHeader.key ||
+                                !newHeader.value ||
+                                headers[newHeader.key] != null
+                            }
+                        >
+                            <AddIcon />
+                        </IconButton>
+                    </ListItemSecondaryAction>
+                </ListItem>
+                {Object.entries(headers).map(([k, v]) => (
+                    <ListItem key={k}>
+                        <TextField
+                            label={k}
+                            value={v}
+                            onChange={e =>
+                                headerChangeHandler(k, e.target.value)
+                            }
+                        />
+                        <ListItemSecondaryAction>
+                            <IconButton
+                                aria-label="Delete"
+                                onClick={deleteHeaderHandler.bind(null, k)}
+                            >
+                                <DeleteIcon />
+                            </IconButton>
+                        </ListItemSecondaryAction>
+                    </ListItem>
+                ))}
+            </List>
+        </ExpansionPanelDetails>
+        <Divider />
+        <ExpansionPanelActions>
+            <Zoom in={expanded} unmountOnExit timeout={transition}>
+                <Button
+                    className={classes.button}
+                    variant="fab"
+                    mini
+                    color="primary"
+                    aria-label="Complete"
+                    onClick={updateHandler}
+                >
+                    <CheckIcon />
+                </Button>
+            </Zoom>
+            <Zoom in={expanded} unmountOnExit timeout={transition}>
+                <Button
+                    className={classes.button}
+                    variant="fab"
+                    mini
+                    color="secondary"
+                    aria-label="Cancel"
+                    onClick={cancelHandler.bind(null, false)}
+                >
+                    <CancelIcon />
+                </Button>
+            </Zoom>
+        </ExpansionPanelActions>
+    </React.Fragment>
+);
+
 export class Route extends React.Component {
 
     constructor(props) {
@@ -321,27 +539,75 @@ export class Route extends React.Component {
                 onChange={(e, expanded) => this.setState({ expanded })}
             >
                 <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography variant="subheading">{`${this.props.data.method.toUpperCase()} ${
-                        this.props.data.path
-                    }`}</Typography>
+                    <Typography
+                        variant="subheading"
+                        className={this.props.classes.flex}
+                    >{`${this.props.data.method.toUpperCase()} ${
+                            this.props.data.path
+                        }`}</Typography>
+                    {this.state.proxy ? <PublicIcon color="primary" /> : null}
                 </ExpansionPanelSummary>
                 {this.state.edit ? (
-                    <Edit
+                    this.state.proxy ? (
+                        <ProxyEdit
+                            classes={this.props.classes}
+                            {...this.state.proxy}
+                            expanded={this.state.expanded}
+                            transition={transition}
+                            newHeader={this.state.newHeader}
+                            changeHandler={this.handleChange.bind(this)}
+                            updateHandler={this.handleUpdate.bind(this)}
+                            cancelHandler={this.handleCancel.bind(this)}
+                            newHeaderChangeHandler={this.handleNewHeaderChange.bind(
+                                this
+                            )}
+                            addHeaderHandler={this.handleAddNewHeader.bind(
+                                this
+                            )}
+                            headerChangeHandler={this.handleHeaderChange.bind(
+                                this
+                            )}
+                            deleteHeaderHandler={this.handleDeleteHeader.bind(
+                                this
+                            )}
+                        />
+                    ) : (
+                        <Edit
+                            classes={this.props.classes}
+                            template={this.props.template}
+                            {...this.state}
+                            expanded={this.state.expanded}
+                            transition={transition}
+                            newHeader={this.state.newHeader}
+                            changeHandler={this.handleChange.bind(this)}
+                            updateHandler={this.handleUpdate.bind(this)}
+                            cancelHandler={this.handleCancel.bind(this)}
+                            newHeaderChangeHandler={this.handleNewHeaderChange.bind(
+                                this
+                            )}
+                            addHeaderHandler={this.handleAddNewHeader.bind(
+                                this
+                            )}
+                            headerChangeHandler={this.handleHeaderChange.bind(
+                                this
+                            )}
+                            deleteHeaderHandler={this.handleDeleteHeader.bind(
+                                this
+                            )}
+                        />
+                    )
+                ) : this.state.proxy ? (
+                    <ProxyView
                         classes={this.props.classes}
-                        template={this.props.template}
-                        {...this.state}
+                        {...this.state.proxy}
                         expanded={this.state.expanded}
                         transition={transition}
-                        newHeader={this.state.newHeader}
-                        changeHandler={this.handleChange.bind(this)}
-                        updateHandler={this.handleUpdate.bind(this)}
-                        cancelHandler={this.handleCancel.bind(this)}
-                        newHeaderChangeHandler={this.handleNewHeaderChange.bind(
+                        headersExpanded={this.state.headersExpanded}
+                        deleteHandler={this.handleDelete.bind(this)}
+                        editHandler={this.handleEdit.bind(this)}
+                        toggleHeadersHandler={this.handleToggleHeaders.bind(
                             this
                         )}
-                        addHeaderHandler={this.handleAddNewHeader.bind(this)}
-                        headerChangeHandler={this.handleHeaderChange.bind(this)}
-                        deleteHeaderHandler={this.handleDeleteHeader.bind(this)}
                     />
                 ) : (
                     <View
@@ -376,10 +642,20 @@ export class Route extends React.Component {
     }
 
     handleChange(key, value) {
-        this.setState(state => ({
-            [key]: value,
-            dirty: new Set(state.dirty).add(key)
-        }));
+        this.setState(
+            state =>
+                state.proxy
+                    ? {
+                        proxy: Object.assign({}, state.proxy, {
+                            [key]: value
+                        }),
+                        dirty: new Set(state.dirty).add('proxy')
+                    }
+                    : {
+                        [key]: value,
+                        dirty: new Set(state.dirty).add(key)
+                    }
+        );
     }
 
     handleCancel() {
@@ -399,22 +675,53 @@ export class Route extends React.Component {
     }
 
     handleHeaderChange(key, value) {
-        this.setState(state => ({
-            headers: Object.assign({}, state.headers, {
-                [key]: value
-            }),
-            dirty: new Set(state.dirty).add('headers')
-        }));
+        this.setState(
+            state =>
+                state.proxy
+                    ? {
+                        proxy: Object.assign({}, state.proxy, {
+                            headers: Object.assign({}, state.proxy.headers, {
+                                [key]: value
+                            })
+                        }),
+                        dirty: new Set(state.dirty).add('proxy')
+                    }
+                    : {
+                        headers: Object.assign({}, state.headers, {
+                            [key]: value
+                        }),
+                        dirty: new Set(state.dirty).add('headers')
+                    }
+        );
     }
 
     handleDeleteHeader(key) {
-        this.setState(state => ({
-            headers: Object.entries(state.headers).reduce(
-                (t, [k, v]) => (key === k ? t : Object.assign(t, { [k]: v })),
-                {}
-            ),
-            dirty: new Set(state.dirty).add('headers')
-        }));
+        this.setState(
+            state =>
+                state.proxy
+                    ? {
+                        proxy: Object.assign({}, state.proxy, {
+                            headers: Object.entries(
+                                state.proxy.headers
+                            ).reduce(
+                                (t, [k, v]) =>
+                                    key === k
+                                        ? t
+                                        : Object.assign(t, { [k]: v }),
+                                {}
+                            )
+                        }),
+                        dirty: new Set(state.dirty).add('proxy')
+                    }
+                    : {
+                        headers: Object.entries(state.headers).reduce(
+                            (t, [k, v]) =>
+                                key === k ? t : Object.assign(t, { [k]: v }),
+                            {}
+                        ),
+                        dirty: new Set(state.dirty).add('headers')
+                    }
+        );
     }
 
     handleNewHeaderChange(key, value) {
@@ -426,13 +733,26 @@ export class Route extends React.Component {
     }
 
     handleAddNewHeader() {
-        this.setState(state => ({
-            headers: Object.assign({}, state.headers, {
-                [state.newHeader.key]: state.newHeader.value
-            }),
-            newHeader: { key: '', value: '' },
-            dirty: new Set(state.dirty).add('headers')
-        }));
+        this.setState(
+            state =>
+                state.proxy
+                    ? {
+                        proxy: Object.assign({}, state.proxy, {
+                            headers: Object.assign({}, state.proxy.headers, {
+                                [state.newHeader.key]: state.newHeader.value
+                            })
+                        }),
+                        newHeader: { key: '', value: '' },
+                        dirty: new Set(state.dirty).add('proxy')
+                    }
+                    : {
+                        headers: Object.assign({}, state.headers, {
+                            [state.newHeader.key]: state.newHeader.value
+                        }),
+                        newHeader: { key: '', value: '' },
+                        dirty: new Set(state.dirty).add('headers')
+                    }
+        );
     }
 
 }

@@ -20,7 +20,7 @@ ALL /api/v1/proxy/*:
     headers:
       X-Real-IP: $remote_addr
       X-Forwarded-For: $proxy_add_x_forwarded_for
-      X-Mockit-Proxy: true
+      X-Mockit-Proxy: 'true'
       Upgrade: $http_upgrade
       User-Agent: $http_user_agent
       Connection: 'upgrade'
