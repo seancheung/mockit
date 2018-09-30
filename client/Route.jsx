@@ -1,6 +1,7 @@
 import React from 'react';
 import List from '@material-ui/core/List';
 import Zoom from '@material-ui/core/Zoom';
+import Badge from '@material-ui/core/Badge';
 import Button from '@material-ui/core/Button';
 import Avatar from '@material-ui/core/Avatar';
 import AddIcon from '@material-ui/icons/Add';
@@ -24,6 +25,7 @@ import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpansionPanelActions from '@material-ui/core/ExpansionPanelActions';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import grey from '@material-ui/core/colors/grey';
 import withStyles from '@material-ui/core/styles/withStyles';
 import classNames from 'classnames';
 import AceEditor from 'react-ace';
@@ -62,6 +64,15 @@ const styles = theme => ({
     },
     flex: {
         flex: 1
+    },
+    badge: {
+        margin: theme.spacing.unit * 2
+    },
+    badgeSpan: {
+        backgroundColor: grey['500']
+    },
+    label: {
+        padding: `0 ${theme.spacing.unit * 2}px`
     }
 });
 
@@ -435,9 +446,20 @@ export const ProxyEdit = ({
                 onChange={e => changeHandler('rewrite', e.target.value)}
                 fullWidth
             />
-            <Typography variant="caption" gutterBottom>
-                Headers
-            </Typography>
+            <Badge
+                badgeContent="!"
+                color="primary"
+                className={classes.badge}
+                classes={{ badge: classes.badgeSpan }}
+            >
+                <Typography
+                    variant="caption"
+                    gutterBottom
+                    className={classes.label}
+                >
+                    Headers
+                </Typography>
+            </Badge>
             <List disablePadding className={classes.spacing}>
                 <ListItem key={'new'}>
                     <TextField
