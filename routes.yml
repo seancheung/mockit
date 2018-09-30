@@ -5,7 +5,10 @@ GET /api/v1/account:
   headers:
     Content-Type: "application/json"
     Server: "Nginx"
-  body: '{"name":"admin"}'
+  body: |-
+    {
+      "name": "admin"
+    }
 PUT /api/v1/account:
   bypass: false
   delay: 0
@@ -25,3 +28,32 @@ ALL /api/v1/proxy/*:
       User-Agent: $http_user_agent
       Connection: 'upgrade'
       Host: $host
+GET /api/v1/users/:id:
+  code: 200
+  body: |-
+    {
+      "id": 0,
+      "name": "unknown"
+    }
+  cond:
+    - case: params.id == 1
+      body: |-
+        {
+          "id": 1,
+          "name": "Alfonzo"
+        }
+    - case: params.id == 2
+      body: |-
+        {
+          "id": 2
+          "name": "Juanita"
+        }
+GET /api/v1/members/:id:
+  code: 200
+  body: |-
+    {
+      "id": ${params.id},
+      "name": "${faker.internet.userName()}",
+      "fullname": "${faker.name.firstName()} ${faker.name.lastName()}",
+      "email": "${faker.internet.email()}",
+    }
