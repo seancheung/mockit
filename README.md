@@ -186,7 +186,7 @@ GET /api/v1/members/:id:
   code: 200
   headers:
     Content-Type: "application/json"
-  # interpolation, possible vars: params, query, faker
+  # see Interpolation for details
   body: |-
     {
       "index": ${params.id},
@@ -487,3 +487,45 @@ Request header field in snakecase
 e.g.
 
 `$http_user_agent` returns client header `User-Agent`
+
+### Interpolation
+
+Expressions encaptured by `${` and `}` in `body` field will be interpolated.
+
+**Basic**
+
+`"${'string field'}"` => `"string field"`
+
+`${1 + 1}` => `2`
+
+`"${'\{using curly braces inside interpolation\}'}"` => `"{using curly braces inside interpolation}"`
+
+
+**Accessing `params` and `query` object**
+
+> `params` keeps the passed-in parameters in route url, `query` stores query string values
+
+*Definition: /api/v1/items/:id*
+
+*Request URL: /api/v1/items/12?color=red*
+
+`${params.id}` => `12`
+
+`${query.color}` => `"red"`
+
+**Faking data**
+
+> `faker` is a [thirdparty library](http://marak.github.io/faker.js)
+
+`${faker.random.number()}` => `1289`
+
+`${faker.random.number}` => `4096`
+
+> the first example calls a function and returns the result
+
+> the second example returns a function which will be called without context
+
+`"${faker.name.firstName}"` => `"James"`
+
+> see **[faker](http://marak.github.io/faker.js)** for reference
+
