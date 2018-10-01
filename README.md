@@ -127,7 +127,10 @@ GET /api/v1/account:
     Content-Type: "application/json"
     Server: "Nginx"
   # response body(string)(optional)
-  body: '{"name":"admin"}'
+  body: |-
+    {
+      "name": "admin"
+    }
 PUT /api/v1/account:
   bypass: false
   delay: 0
@@ -153,6 +156,51 @@ ALL /api/v1/proxy/*:
       User-Agent: $http_user_agent
       Connection: "upgrade"
       Host: $host
+# using params in url
+GET /api/v1/users/:id:
+  code: 404
+  headers:
+    Content-Type: "application/json"
+  body: |-
+    {
+      "id": 0,
+      "name": "unknown"
+    }
+  # using conditions
+  cond:
+    - case: params.id == 1
+      code: 200
+      body: |-
+        {
+          "id": 1,
+          "name": "Alfonzo"
+        }
+    - case: params.id == 2
+      code: 200
+      body: |-
+        {
+          "id": 2
+          "name": "Juanita"
+        }
+GET /api/v1/members/:id:
+  code: 200
+  headers:
+    Content-Type: "application/json"
+  # interpolation, possible vars: params, query, faker
+  body: |-
+    {
+      "index": ${params.id},
+      "uid": ${faker.random.number() + params.id},
+      "name": "${faker.internet.userName()}",
+      "fullname": "${faker.name.firstName} ${faker.name.lastName()}",
+      "email": "${faker.internet.email}",
+      "location": {
+        "latitude": ${faker.address.latitude},
+        "longitude": ${faker.address.longitude}
+      },
+      "desc": "${faker.lorem.paragraph}",
+      "escape": "${'\{' + 'using curly braces inside interpo template' + '\}'}"
+    }
 ```
 
 routes.json
@@ -192,6 +240,30 @@ routes.json
         "Host": "$host"
       }
     }
+  },
+  "GET /api/v1/users/:id": {
+    "code": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": "{\"id\":0,\"name\":\"unknown\"}",
+    "cond": [
+      {
+        "case": "params.id == 1",
+        "body": "{\"id\":1,\"name\":\"Alfonzo\"}"
+      },
+      {
+        "case": "params.id == 2",
+        "body": "{\"id\":2,\"name\":\"Juanita\"}"
+      }
+    ]
+  },
+  "GET /api/v1/members/:id": {
+    "code": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": "{\"index\":${params.id},\"uid\":${faker.random.number() + params.id},\"name\":\"${faker.internet.userName()}\",\"fullname\":\"${faker.name.firstName} ${faker.name.lastName()}\",\"email\":\"${faker.internet.email}\",\"location\": {\"latitude\":${faker.address.latitude},\"longitude\":${faker.address.longitude}},\"desc\":\"${faker.lorem.paragraph}\",\"escape\":\"${'\\{' + 'using curly braces inside interpo template' + '\\}'}\"}"
   }
 }
 ```
@@ -408,7 +480,7 @@ Client request IP
 
 Concat client `X-Forwarded-For` header(if exists) with Client IP
 
-**$http_{name}**
+**$http\_{name}**
 
 Request header field in snakecase
 

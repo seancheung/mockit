@@ -1,7 +1,6 @@
 import React from 'react';
 import List from '@material-ui/core/List';
 import Zoom from '@material-ui/core/Zoom';
-import Badge from '@material-ui/core/Badge';
 import Button from '@material-ui/core/Button';
 import Avatar from '@material-ui/core/Avatar';
 import AddIcon from '@material-ui/icons/Add';
@@ -66,10 +65,11 @@ const styles = theme => ({
         flex: 1
     },
     badge: {
-        margin: theme.spacing.unit * 2
-    },
-    badgeSpan: {
-        backgroundColor: grey['500']
+        backgroundColor: grey['500'],
+        width: '12px',
+        height: '12px',
+        top: '-3px',
+        right: '0px'
     },
     label: {
         padding: `0 ${theme.spacing.unit * 2}px`
@@ -446,22 +446,15 @@ export const ProxyEdit = ({
                 onChange={e => changeHandler('rewrite', e.target.value)}
                 fullWidth
             />
-            <Badge
-                badgeContent="!"
-                color="primary"
-                className={classes.badge}
-                classes={{ badge: classes.badgeSpan }}
+            <Typography
+                variant="caption"
+                gutterBottom
+                className={classes.label}
             >
-                <Typography
-                    variant="caption"
-                    gutterBottom
-                    className={classes.label}
-                >
-                    Headers
-                </Typography>
-            </Badge>
+                Headers
+            </Typography>
             <List disablePadding className={classes.spacing}>
-                <ListItem key={'new'}>
+                <ListItem key="__new">
                     <TextField
                         label="Key"
                         value={newHeader.key}

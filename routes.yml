@@ -30,26 +30,30 @@ ALL /api/v1/proxy/*:
       Host: $host
 GET /api/v1/users/:id:
   code: 200
+  headers:
+    Content-Type: "application/json"
   body: |-
     {
       "id": 0,
       "name": "unknown"
     }
   cond:
-    - case: params.id == 1
-      body: |-
-        {
-          "id": 1,
-          "name": "Alfonzo"
-        }
-    - case: params.id == 2
-      body: |-
-        {
-          "id": 2
-          "name": "Juanita"
-        }
+  - case: params.id == 1
+    body: |-
+      {
+        "id": 1,
+        "name": "Alfonzo"
+      }
+  - case: params.id == 2
+    body: |-
+      {
+        "id": 2,
+        "name": "Juanita"
+      }
 GET /api/v1/members/:id:
   code: 200
+  headers:
+    Content-Type: "application/json"
   body: |-
     {
       "index": ${params.id},
