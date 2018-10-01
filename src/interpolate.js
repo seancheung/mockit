@@ -1,14 +1,34 @@
 const vm = require('vm');
 const faker = require('faker');
 
+function unescape(exp) {
+    return exp.replace(/\\(.)/g, (_, c) => c);
+}
+
 function interpolate(src, req) {
     if (typeof src !== 'string') {
         return src;
     }
 
-    return src.replace(/\$\{(.+?)\}/g, (_, exp) =>
-        vm.runInNewContext(exp, { faker, params: req.params, query: req.query })
-    );
+    return src.replace(/\$\{((?:[^{}\\]|\\.)+)\}/g, (_, exp) => {
+        exp = unescape(exp);
+        let value = vm.runInNewContext(exp, {
+            faker,
+            params: req.params,
+            query: req.query
+        });
+        if (typeof value === 'function') {
+            value = value.call();
+        }
+        if (value == null) {
+            value = '';
+        }
+        if (typeof value === 'object') {
+            value = JSON.stringify(value);
+        }
+
+        return value;
+    });
 }
 
 module.exports = route => (req, res, next) => {
@@ -33,14 +53,14 @@ module.exports = route => (req, res, next) => {
                 if (item.code) {
                     $route.code = item.code;
                 }
-                if (item.body) {
-                    $route.body = interpolate(item.body, req);
-                }
                 if (item.headers) {
                     $route.headers = Object.assign(
                         $route.headers || {},
                         item.headers
                     );
+                }
+                if (item.body) {
+                    $route.body = interpolate(item.body, req);
                 }
                 break;
             }

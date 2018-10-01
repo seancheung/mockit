@@ -52,8 +52,15 @@ GET /api/v1/members/:id:
   code: 200
   body: |-
     {
-      "id": ${params.id},
+      "index": ${params.id},
+      "uid": ${faker.random.number() + params.id},
       "name": "${faker.internet.userName()}",
-      "fullname": "${faker.name.firstName()} ${faker.name.lastName()}",
-      "email": "${faker.internet.email()}",
+      "fullname": "${faker.name.firstName} ${faker.name.lastName()}",
+      "email": "${faker.internet.email}",
+      "location": {
+        "latitude": ${faker.address.latitude},
+        "longitude": ${faker.address.longitude}
+      },
+      "desc": "${faker.lorem.paragraph}",
+      "escape": "${'\{' + 'using curly braces inside interpo template' + '\}'}"
     }
