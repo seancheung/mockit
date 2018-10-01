@@ -1,0 +1,71 @@
+const vm = require('vm');
+const faker = require('faker');
+
+function unescape(exp) {
+    return exp.replace(/\\(.)/g, (_, c) => c);
+}
+
+function interpolate(src, req) {
+    if (typeof src !== 'string') {
+        return src;
+    }
+
+    return src.replace(/\$\{((?:[^{}\\]|\\.)+)\}/g, (_, exp) => {
+        exp = unescape(exp);
+        let value = vm.runInNewContext(exp, {
+            faker,
+            params: req.params,
+            query: req.query
+        });
+        if (typeof value === 'function') {
+            value = value.call();
+        }
+        if (value == null) {
+            value = '';
+        }
+        if (typeof value === 'object') {
+            value = JSON.stringify(value);
+        }
+
+        return value;
+    });
+}
+
+module.exports = route => (req, res, next) => {
+    const $route = {},
+        { code, headers, body, cond } = route;
+    if (code) {
+        $route.code = route.code;
+    }
+    if (headers) {
+        $route.headers = Object.assign({}, headers);
+    }
+    if (body != null) {
+        $route.body = interpolate(body, req);
+    }
+    if (cond) {
+        for (const item of cond) {
+            const success = vm.runInNewContext(item.case, {
+                params: req.params,
+                query: req.query
+            });
+            if (success === true) {
+                if (item.code) {
+                    $route.code = item.code;
+                }
+                if (item.headers) {
+                    $route.headers = Object.assign(
+                        $route.headers || {},
+                        item.headers
+                    );
+                }
+                if (item.body) {
+                    $route.body = interpolate(item.body, req);
+                }
+                break;
+            }
+        }
+    }
+    req.$route = $route;
+    next();
+};

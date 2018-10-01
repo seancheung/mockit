@@ -14,7 +14,8 @@ export const ROUTE_KEYS = [
     'bypass',
     'delay',
     'headers',
-    'body'
+    'body',
+    'proxy'
 ];
 
 export function getRoutes(offset, limit) {

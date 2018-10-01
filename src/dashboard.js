@@ -6,11 +6,14 @@ module.exports = (app, config, db, target, mode) => {
     if (mode === 'production') {
         dashboard.use(express.static(path.resolve(__dirname, '../www')));
     } else {
+        const options = require('../client/webpack.config')(mode);
+        if (config.baseUrl) {
+            options.output.publicPath = config.baseUrl.replace(/\/$/, '') + '/';
+        }
         dashboard.use(
-            require('webpack-dev-middleware')(
-                require('webpack')(require('../client/webpack.config')(mode)),
-                { logLevel: 'error' }
-            )
+            require('webpack-dev-middleware')(require('webpack')(options), {
+                logLevel: 'error'
+            })
         );
     }
 
@@ -44,7 +47,8 @@ module.exports = (app, config, db, target, mode) => {
                 code,
                 headers,
                 body,
-                bypass
+                bypass,
+                proxy
             } = req.body;
             if (!method || !path) {
                 const error = new Error('missing required arguments');
@@ -55,17 +59,33 @@ module.exports = (app, config, db, target, mode) => {
                 path,
                 method: method.toLowerCase()
             };
-            if (delay != undefined) {
-                data.delay = delay;
-            }
-            if (code != undefined) {
-                data.code = code;
-            }
-            if (headers != undefined) {
-                data.headers = headers;
-            }
-            if (body != undefined) {
-                data.body = body;
+            if (proxy == null) {
+                if (delay != undefined) {
+                    data.delay = delay;
+                }
+                if (code != undefined) {
+                    data.code = code;
+                }
+                if (headers != undefined) {
+                    data.headers = headers;
+                }
+                if (body != undefined) {
+                    data.body = body;
+                }
+            } else {
+                data.proxy = {};
+                if (!proxy.remote) {
+                    const error = new Error('missing required arguments');
+                    error.status = 400;
+                    throw error;
+                }
+                data.proxy.remote = proxy.remote;
+                if (proxy.rewrite) {
+                    data.proxy.rewrite = proxy.rewrite;
+                }
+                if (proxy.headers != undefined) {
+                    data.proxy.headers = proxy.headers;
+                }
             }
             if (bypass != undefined) {
                 data.bypass = bypass;

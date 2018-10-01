@@ -116,18 +116,21 @@ routes.yml
 ```yaml
 # method and path
 GET /api/v1/account:
-  # bypass(disable) this route
+  # bypass(disable) this route(optional)
   bypass: false
-  # simulate response delay in milliseconds
+  # simulate response delay in milliseconds(optional)
   delay: 1000
   # http status code
   code: 200
-  # response headers
+  # response headers(optional)
   headers:
     Content-Type: "application/json"
     Server: "Nginx"
-  # response body(string)
-  body: '{"name":"admin"}'
+  # response body(string)(optional)
+  body: |-
+    {
+      "name": "admin"
+    }
 PUT /api/v1/account:
   bypass: false
   delay: 0
@@ -135,6 +138,69 @@ PUT /api/v1/account:
   headers:
     Content-Type: "application/json"
     Server: "Nginx"
+# match all methods and sub paths
+ALL /api/v1/proxy/*:
+  # reverse proxy
+  proxy:
+    # proxy remote
+    remote: "https://jsonplaceholder.typicode.com"
+    # rewrite rules in niginx style(optional)
+    rewrite: ^/api/v1/proxy/(.*) /posts/$1
+    # proxy headers(optional)
+    headers:
+      # see Proxy Header Variables for details
+      X-Real-IP: $remote_addr
+      X-Forwarded-For: $proxy_add_x_forwarded_for
+      X-Mockit-Proxy: true
+      Upgrade: $http_upgrade
+      User-Agent: $http_user_agent
+      Connection: "upgrade"
+      Host: $host
+# using params in url
+GET /api/v1/users/:id:
+  code: 404
+  headers:
+    Content-Type: "application/json"
+  body: |-
+    {
+      "id": 0,
+      "name": "unknown"
+    }
+  # using conditions
+  cond:
+    - case: params.id == 1
+      code: 200
+      body: |-
+        {
+          "id": 1,
+          "name": "Alfonzo"
+        }
+    - case: params.id == 2
+      code: 200
+      body: |-
+        {
+          "id": 2
+          "name": "Juanita"
+        }
+GET /api/v1/members/:id:
+  code: 200
+  headers:
+    Content-Type: "application/json"
+  # see Interpolation for details
+  body: |-
+    {
+      "index": ${params.id},
+      "uid": ${faker.random.number() + params.id},
+      "name": "${faker.internet.userName()}",
+      "fullname": "${faker.name.firstName} ${faker.name.lastName()}",
+      "email": "${faker.internet.email}",
+      "location": {
+        "latitude": ${faker.address.latitude},
+        "longitude": ${faker.address.longitude}
+      },
+      "desc": "${faker.lorem.paragraph}",
+      "escape": "${'\{' + 'using curly braces inside interpo template' + '\}'}"
+    }
 ```
 
 routes.json
@@ -159,6 +225,45 @@ routes.json
       "Content-Type": "application/json",
       "Server": "Nginx"
     }
+  },
+  "ALL /api/v1/proxy/*": {
+    "proxy": {
+      "remote": "https://jsonplaceholder.typicode.com",
+      "rewrite": "^/api/v1/proxy/(.*) /posts/$1",
+      "headers": {
+        "X-Real-IP": "$remote_addr",
+        "X-Forwarded-For": "$proxy_add_x_forwarded_for",
+        "X-Mockit-Proxy": true,
+        "Upgrade": "$http_upgrade",
+        "User-Agent": "$http_user_agent",
+        "Connection": "upgrade",
+        "Host": "$host"
+      }
+    }
+  },
+  "GET /api/v1/users/:id": {
+    "code": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": "{\"id\":0,\"name\":\"unknown\"}",
+    "cond": [
+      {
+        "case": "params.id == 1",
+        "body": "{\"id\":1,\"name\":\"Alfonzo\"}"
+      },
+      {
+        "case": "params.id == 2",
+        "body": "{\"id\":2,\"name\":\"Juanita\"}"
+      }
+    ]
+  },
+  "GET /api/v1/members/:id": {
+    "code": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": "{\"index\":${params.id},\"uid\":${faker.random.number() + params.id},\"name\":\"${faker.internet.userName()}\",\"fullname\":\"${faker.name.firstName} ${faker.name.lastName()}\",\"email\":\"${faker.internet.email}\",\"location\": {\"latitude\":${faker.address.latitude},\"longitude\":${faker.address.longitude}},\"desc\":\"${faker.lorem.paragraph}\",\"escape\":\"${'\\{' + 'using curly braces inside interpo template' + '\\}'}\"}"
   }
 }
 ```
@@ -177,6 +282,8 @@ methods:
   - "OPTIONS"
   - "TRACE"
   - "PATCH"
+  # catch all
+  - "ALL"
 # http status codes and descriptions
 codes:
   "100": "Continue"
@@ -358,3 +465,67 @@ template.json
   ]
 }
 ```
+
+#### Proxy Header Variables
+
+**$host**
+
+Proxy remote host name
+
+**$remote_addr**
+
+Client request IP
+
+**$proxy_add_x_forwarded_for**
+
+Concat client `X-Forwarded-For` header(if exists) with Client IP
+
+**$http\_{name}**
+
+Request header field in snakecase
+
+e.g.
+
+`$http_user_agent` returns client header `User-Agent`
+
+### Interpolation
+
+Expressions encaptured by `${` and `}` in `body` field will be interpolated.
+
+**Basic**
+
+`"${'string field'}"` => `"string field"`
+
+`${1 + 1}` => `2`
+
+`"${'\{using curly braces inside interpolation\}'}"` => `"{using curly braces inside interpolation}"`
+
+
+**Accessing `params` and `query` object**
+
+> `params` keeps the passed-in parameters in route url, `query` stores query string values
+
+*Definition: /api/v1/items/:id*
+
+*Request URL: /api/v1/items/12?color=red*
+
+`${params.id}` => `12`
+
+`${query.color}` => `"red"`
+
+**Faking data**
+
+> `faker` is a [thirdparty library](http://marak.github.io/faker.js)
+
+`${faker.random.number()}` => `1289`
+
+`${faker.random.number}` => `4096`
+
+> the first example calls a function and returns the result
+
+> the second example returns a function which will be called without context
+
+`"${faker.name.firstName}"` => `"James"`
+
+> see **[faker](http://marak.github.io/faker.js)** for reference
+
