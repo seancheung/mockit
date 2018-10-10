@@ -1,19 +1,6 @@
 const vm = require('vm');
 
-const faker = new Proxy(function() {}, {
-    get(t, p, r) {
-        return Reflect.get(require('faker'), p, r);
-    },
-    has(t, p) {
-        return Reflect.has(require('faker'), p);
-    },
-    ownKeys() {
-        return Reflect.ownKeys(require('faker'));
-    },
-    apply(t, c, a) {
-        return require(`faker/locale/${a[0]}`);
-    }
-});
+const faker = require('faker');
 
 function unescape(exp) {
     return exp.replace(/\\(.)/g, (_, c) => c);
@@ -28,6 +15,7 @@ function interpolate(src, req) {
         exp = unescape(exp);
         let value = vm.runInNewContext(exp, {
             faker,
+            $faker: locale => require(`faker/locale/${locale}`),
             params: req.params,
             query: req.query,
             body: req.body,

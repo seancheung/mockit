@@ -542,9 +542,9 @@ Expressions encaptured by `${` and `}` in `body` field will be interpolated.
 
 `"${faker.name.firstName}"` => `"James"`
 
-> `faker` can be called as a function to use specific locale(for the current context only)
+> `$faker` is an additional function which can be called to use a specific locale(for the current context only)
 
-`"${faker('zh_CN').name.firstName}"` => `"朱"`
+`"${$faker('zh_CN').name.firstName}"` => `"朱"`
 
 > see **[faker](http://marak.github.io/faker.js)** for reference
 

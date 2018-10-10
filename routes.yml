@@ -59,7 +59,7 @@ GET /api/v1/members/:id:
       "index": ${params.id},
       "uid": ${faker.random.number() + params.id},
       "name": "${faker.internet.userName()}",
-      "fullname": "${faker('zh_CN').name.firstName}${faker('zh_CN').name.lastName()}",
+      "fullname": "${$faker('zh_CN').name.firstName}${$faker('zh_CN').name.lastName()}",
       "email": "${faker.internet.email}",
       "location": {
         "latitude": ${faker.address.latitude},

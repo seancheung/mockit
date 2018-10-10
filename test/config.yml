@@ -76,7 +76,7 @@ router:
         {
           "id": ${faker.random.number()},
           "name": "${faker.internet.userName()}",
-          "fullname": "${faker.name.firstName} ${faker.name.lastName()}",
+          "fullname": "${$faker('zh_CN').name.firstName}${$faker('zh_CN').name.lastName()}",
           "email": "${faker.internet.email}",
           "location": {
             "latitude": ${faker.address.latitude},
