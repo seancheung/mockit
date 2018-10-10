@@ -1,20 +1,10 @@
-const path = require('path');
 const express = require('express');
 
-module.exports = (app, config, db, target, mode) => {
+module.exports = (app, config, db, target, ...plugins) => {
     const dashboard = express.Router({ mergeParams: true });
-    if (mode === 'production') {
-        dashboard.use(express.static(path.resolve(__dirname, '../www')));
-    } else {
-        const options = require('../client/webpack.config')(mode);
-        if (config.baseUrl) {
-            options.output.publicPath = config.baseUrl.replace(/\/$/, '') + '/';
-        }
-        dashboard.use(
-            require('webpack-dev-middleware')(require('webpack')(options), {
-                logLevel: 'error'
-            })
-        );
+
+    if (plugins) {
+        plugins.forEach(plugin => plugin(dashboard));
     }
 
     dashboard.head('/routes', (req, res, next) => {

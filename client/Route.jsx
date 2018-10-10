@@ -247,7 +247,7 @@ export const Edit = ({
                 Headers
             </Typography>
             <List disablePadding className={classes.spacing}>
-                <ListItem key={'new'}>
+                <ListItem key={'__new'}>
                     <TextField
                         label="Key"
                         value={newHeader.key}

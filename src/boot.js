@@ -27,7 +27,8 @@ module.exports = config => {
             target.reload();
         });
     }
-    require('./dashboard')(app, config.dashboard, db, target, config.mode);
+    const webpack = require('./webpack')(config.dashboard, config.mode);
+    require('./dashboard')(app, config.dashboard, db, target, webpack);
     require('./handler')(app);
 
     let server;
