@@ -501,17 +501,25 @@ Expressions encaptured by `${` and `}` in `body` field will be interpolated.
 `"${'\{using curly braces inside interpolation\}'}"` => `"{using curly braces inside interpolation}"`
 
 
-**Accessing `params` and `query` object**
+**Accessing `params`, `query`, `body` and `headers`**
 
-> `params` keeps the passed-in parameters in route url, `query` stores query string values
+> `params` keeps the passed-in parameters in route url, `query` stores request query string values, `body` and `headers` hold request body and headers respectively
 
 *Definition: /api/v1/items/:id*
 
 *Request URL: /api/v1/items/12?color=red*
 
+*Request Headers: {'x-version':'1.31'}*
+
+*Request body: '{"count": 9}'*
+
 `${params.id}` => `12`
 
 `${query.color}` => `"red"`
+
+`${body.data}` => `{"count": 9}`
+
+`${headers['x-version']}` => `"1.31"`
 
 **Faking data**
 

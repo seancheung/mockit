@@ -15,7 +15,9 @@ function interpolate(src, req) {
         let value = vm.runInNewContext(exp, {
             faker,
             params: req.params,
-            query: req.query
+            query: req.query,
+            body: req.body,
+            headers: req.headers
         });
         if (typeof value === 'function') {
             value = value.call();
@@ -47,7 +49,9 @@ module.exports = route => (req, res, next) => {
         for (const item of cond) {
             const success = vm.runInNewContext(item.case, {
                 params: req.params,
-                query: req.query
+                query: req.query,
+                body: req.body,
+                headers: req.headers
             });
             if (success === true) {
                 if (item.code) {
