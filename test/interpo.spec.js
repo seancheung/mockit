@@ -40,7 +40,7 @@ describe('routes interpo test', function() {
                 expect(res.body).to.be.an('object');
                 expect(res.body.id).to.be.a('number');
                 expect(res.body.name).to.be.a('string');
-                expect(/^[\w]+\s[\w]+$/.test(res.body.fullname)).to.be.true;
+                expect(res.body.fullname).to.be.a('string');
                 expect(/\S+@\S+\.\S+/.test(res.body.email)).to.be.true;
                 expect(res.body.location)
                     .to.be.an('object')
