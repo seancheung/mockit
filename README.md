@@ -1,6 +1,13 @@
 # mockit
 
+[![Dist Build][travis-dist]][travis-url]
+[![Dev Build][travis-dev]][travis-url]
+
 Http API mock for frontend development
+
+[travis-dist]: https://img.shields.io/travis/seancheung/mockit/dist.svg?label=dist
+[travis-dev]: https://img.shields.io/travis/seancheung/mockit/dev.svg?label=dev
+[travis-url]: https://travis-ci.org/seancheung/mockit
 
 ## Install
 
@@ -537,3 +544,12 @@ Expressions encaptured by `${` and `}` in `body` field will be interpolated.
 
 > see **[faker](http://marak.github.io/faker.js)** for reference
 
+## Test
+
+```bash
+npm test
+```
+
+## License
+
+See [License](https://github.com/seancheung/mockit/blob/master/LICENSE)
