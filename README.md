@@ -199,7 +199,7 @@ GET /api/v1/members/:id:
       "index": ${params.id},
       "uid": ${faker.random.number() + params.id},
       "name": "${faker.internet.userName()}",
-      "fullname": "${faker.name.firstName} ${faker.name.lastName()}",
+      "fullname": "${faker('zh_CN').name.firstName}${faker('zh_CN').name.lastName()}"
       "email": "${faker.internet.email}",
       "location": {
         "latitude": ${faker.address.latitude},
@@ -270,7 +270,7 @@ routes.json
     "headers": {
       "Content-Type": "application/json"
     },
-    "body": "{\"index\":${params.id},\"uid\":${faker.random.number() + params.id},\"name\":\"${faker.internet.userName()}\",\"fullname\":\"${faker.name.firstName} ${faker.name.lastName()}\",\"email\":\"${faker.internet.email}\",\"location\": {\"latitude\":${faker.address.latitude},\"longitude\":${faker.address.longitude}},\"desc\":\"${faker.lorem.paragraph}\",\"escape\":\"${'\\{' + 'using curly braces inside interpo template' + '\\}'}\"}"
+    "body": "{\"index\":${params.id},\"uid\":${faker.random.number() + params.id},\"name\":\"${faker.internet.userName()}\",\"fullname\":\"${faker(\"zh_CN\").name.firstName}${faker(\"zh_CN\").name.lastName()}\",\"email\":\"${faker.internet.email}\",\"location\": {\"latitude\":${faker.address.latitude},\"longitude\":${faker.address.longitude}},\"desc\":\"${faker.lorem.paragraph}\",\"escape\":\"${'\\{' + 'using curly braces inside interpo template' + '\\}'}\"}"
   }
 }
 ```
@@ -541,6 +541,10 @@ Expressions encaptured by `${` and `}` in `body` field will be interpolated.
 > the second example returns a function which will be called without context
 
 `"${faker.name.firstName}"` => `"James"`
+
+> `faker` can be called as a function to use specific locale(for the current context only)
+
+`"${faker('zh_CN').name.firstName}"` => `"朱"`
 
 > see **[faker](http://marak.github.io/faker.js)** for reference
 

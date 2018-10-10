@@ -1,5 +1,19 @@
 const vm = require('vm');
-const faker = require('faker');
+
+const faker = new Proxy(function() {}, {
+    get(t, p, r) {
+        return Reflect.get(require('faker'), p, r);
+    },
+    has(t, p) {
+        return Reflect.has(require('faker'), p);
+    },
+    ownKeys() {
+        return Reflect.ownKeys(require('faker'));
+    },
+    apply(t, c, a) {
+        return require(`faker/locale/${a[0]}`);
+    }
+});
 
 function unescape(exp) {
     return exp.replace(/\\(.)/g, (_, c) => c);

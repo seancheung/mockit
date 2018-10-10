@@ -1,11 +1,10 @@
 {
   "name": "mockitjs",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Http API mock for frontend development",
   "main": "index.js",
   "scripts": {
     "test": "mocha test/*.spec.js",
-    "start": "node ./src/server.js",
     "build": "webpack --config ./client/webpack.config.js --mode=production"
   },
   "bin": {
