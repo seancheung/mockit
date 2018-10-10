@@ -35,7 +35,7 @@ function interpolate(src, req) {
 
 module.exports = route => (req, res, next) => {
     const $route = {},
-        { code, headers, body, cond } = route;
+        { code, headers, body, cond, delay } = route;
     if (code) {
         $route.code = route.code;
     }
@@ -44,6 +44,9 @@ module.exports = route => (req, res, next) => {
     }
     if (body != null) {
         $route.body = interpolate(body, req);
+    }
+    if (delay != null) {
+        $route.delay = delay;
     }
     if (cond) {
         for (const item of cond) {

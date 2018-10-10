@@ -54,6 +54,7 @@ module.exports = route => (req, res, next) => {
         url,
         params: req.params,
         query: req.query,
-        headers: Object.assign({}, /*req.headers,*/ headers)
+        headers: Object.assign({}, /*req.headers,*/ headers),
+        body: req.body
     })(req, res, next);
 };
