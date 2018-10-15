@@ -1,8 +1,9 @@
 {
   "name": "mockitjs",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "Http API mock for frontend development",
   "main": "index.js",
+  "types": "index.d.ts",
   "scripts": {
     "test": "mocha test/*.spec.js",
     "build": "webpack --config ./client/webpack.config.js --mode=production"

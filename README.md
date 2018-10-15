@@ -548,6 +548,21 @@ Expressions encaptured by `${` and `}` in `body` field will be interpolated.
 
 > see **[faker](http://marak.github.io/faker.js)** for reference
 
+
+## Integrate into Express
+
+```javascript
+const mockit = require('mockit');
+// create an express router
+const router = mockit('/path/to/routes.yml');
+app.use('/ap1/mock', router);
+```
+
+```javascript
+// to enable file change watcher auto reload
+const router = mockit('/path/to/routes.yml', true);
+```
+
 ## Test
 
 ```bash

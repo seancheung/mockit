@@ -1,1 +1,1 @@
-module.exports = require('./src/boot');
+module.exports = require('./src/mock');
