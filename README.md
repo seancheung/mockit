@@ -326,7 +326,32 @@ See [mockit-express](https://github.com/seancheung/mockit-express#config)
 
 ## Integrate into Express
 
-See [mockit-express](https://www.npmjs.com/package/mockit-express)
+See [mockit-express](https://github.com/seancheung/mockit-express)
+
+## Integrate into Webpack
+
+With dashboard(UI)
+
+```javascript
+const mockit = require("mockit");
+//...
+module.exports = {
+  //...
+  devServer: {
+    after: function(app) {
+      mockit({
+        baseUrl: "/dashboard",
+        routes: "/path/to/routes/file",
+        watch: true
+      })(app);
+    }
+  }
+};
+```
+
+Without dashboard(UI)
+
+See [mockit-express](https://github.com/seancheung/mockit-express#integrate-into-webpack)
 
 ## Test
 
