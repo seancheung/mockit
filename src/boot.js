@@ -3,7 +3,7 @@ module.exports = config => {
     if (!config.debug) {
         logger.log = () => {};
     }
-    const Database = require('./db');
+    const { Database } = require('mockit-express');
     const db = new Database();
     if (config.router.persist) {
         db.persist(config.router.persist);
@@ -15,8 +15,7 @@ module.exports = config => {
     if (config.logger && config.logger.enabled) {
         app.use(require('morgan')(config.logger.type || 'combined'));
     }
-    const target = require('./router')(app, config.router, db);
-    target.reload();
+    require('./router')(app, config.router, db);
     if (config.router.watcher) {
         config.router.watcher.on('reloaded', routes => {
             if (routes) {
@@ -24,11 +23,10 @@ module.exports = config => {
             } else {
                 db.drop();
             }
-            target.reload();
         });
     }
     const webpack = require('./webpack')(config.dashboard, config.mode);
-    require('./dashboard')(app, config.dashboard, db, target, webpack);
+    require('./dashboard')(app, config.dashboard, db, webpack);
     require('./handler')(app);
 
     let server;
