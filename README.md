@@ -55,7 +55,9 @@ mockit ./config.yml
 mockit ./config.json
 ```
 
-### Config
+## Config
+
+### App
 
 config.yml
 
@@ -118,162 +120,7 @@ config.json
 }
 ```
 
-routes.yml
-
-```yaml
-# method and path
-GET /api/v1/account:
-  # bypass(disable) this route(optional)
-  bypass: false
-  # simulate response delay in milliseconds(optional)
-  delay: 1000
-  # http status code
-  code: 200
-  # response headers(optional)
-  headers:
-    Content-Type: "application/json"
-    Server: "Nginx"
-  # response body(string)(optional)
-  body: |-
-    {
-      "name": "admin"
-    }
-PUT /api/v1/account:
-  bypass: false
-  delay: 0
-  code: 204
-  headers:
-    Content-Type: "application/json"
-    Server: "Nginx"
-# match all methods and sub paths
-ALL /api/v1/proxy/*:
-  # reverse proxy
-  proxy:
-    # proxy remote
-    remote: "https://jsonplaceholder.typicode.com"
-    # rewrite rules in niginx style(optional)
-    rewrite: ^/api/v1/proxy/(.*) /posts/$1
-    # proxy headers(optional)
-    headers:
-      # see Proxy Header Variables for details
-      X-Real-IP: $remote_addr
-      X-Forwarded-For: $proxy_add_x_forwarded_for
-      X-Mockit-Proxy: true
-      Upgrade: $http_upgrade
-      User-Agent: $http_user_agent
-      Connection: "upgrade"
-      Host: $host
-# using params in url
-GET /api/v1/users/:id:
-  code: 404
-  headers:
-    Content-Type: "application/json"
-  body: |-
-    {
-      "id": 0,
-      "name": "unknown"
-    }
-  # using conditions
-  cond:
-    - case: params.id == 1
-      code: 200
-      body: |-
-        {
-          "id": 1,
-          "name": "Alfonzo"
-        }
-    - case: params.id == 2
-      code: 200
-      body: |-
-        {
-          "id": 2
-          "name": "Juanita"
-        }
-GET /api/v1/members/:id:
-  code: 200
-  headers:
-    Content-Type: "application/json"
-  # see Interpolation for details
-  body: |-
-    {
-      "index": ${params.id},
-      "uid": ${faker.random.number() + params.id},
-      "name": "${faker.internet.userName()}",
-      "fullname": "${faker('zh_CN').name.firstName}${faker('zh_CN').name.lastName()}"
-      "email": "${faker.internet.email}",
-      "location": {
-        "latitude": ${faker.address.latitude},
-        "longitude": ${faker.address.longitude}
-      },
-      "desc": "${faker.lorem.paragraph}",
-      "escape": "${'\{' + 'using curly braces inside interpo template' + '\}'}"
-    }
-```
-
-routes.json
-
-```json
-{
-  "GET /api/v1/account": {
-    "bypass": false,
-    "delay": 1000,
-    "code": 200,
-    "headers": {
-      "Content-Type": "application/json",
-      "Server": "Nginx"
-    },
-    "body": "{\"name\":\"admin\"}"
-  },
-  "PUT /api/v1/account": {
-    "bypass": false,
-    "delay": 0,
-    "code": 200,
-    "headers": {
-      "Content-Type": "application/json",
-      "Server": "Nginx"
-    }
-  },
-  "ALL /api/v1/proxy/*": {
-    "proxy": {
-      "remote": "https://jsonplaceholder.typicode.com",
-      "rewrite": "^/api/v1/proxy/(.*) /posts/$1",
-      "headers": {
-        "X-Real-IP": "$remote_addr",
-        "X-Forwarded-For": "$proxy_add_x_forwarded_for",
-        "X-Mockit-Proxy": true,
-        "Upgrade": "$http_upgrade",
-        "User-Agent": "$http_user_agent",
-        "Connection": "upgrade",
-        "Host": "$host"
-      }
-    }
-  },
-  "GET /api/v1/users/:id": {
-    "code": 200,
-    "headers": {
-      "Content-Type": "application/json"
-    },
-    "body": "{\"id\":0,\"name\":\"unknown\"}",
-    "cond": [
-      {
-        "case": "params.id == 1",
-        "body": "{\"id\":1,\"name\":\"Alfonzo\"}"
-      },
-      {
-        "case": "params.id == 2",
-        "body": "{\"id\":2,\"name\":\"Juanita\"}"
-      }
-    ]
-  },
-  "GET /api/v1/members/:id": {
-    "code": 200,
-    "headers": {
-      "Content-Type": "application/json"
-    },
-    "body": "{\"index\":${params.id},\"uid\":${faker.random.number() + params.id},\"name\":\"${faker.internet.userName()}\",\"fullname\":\"${faker(\"zh_CN\").name.firstName}${faker(\"zh_CN\").name.lastName()}\",\"email\":\"${faker.internet.email}\",\"location\": {\"latitude\":${faker.address.latitude},\"longitude\":${faker.address.longitude}},\"desc\":\"${faker.lorem.paragraph}\",\"escape\":\"${'\\{' + 'using curly braces inside interpo template' + '\\}'}\"}"
-  }
-}
-```
+### Template
 
 template.yml
 
@@ -473,95 +320,13 @@ template.json
 }
 ```
 
-#### Proxy Header Variables
+### Routes
 
-**$host**
-
-Proxy remote host name
-
-**$remote_addr**
-
-Client request IP
-
-**$proxy_add_x_forwarded_for**
-
-Concat client `X-Forwarded-For` header(if exists) with Client IP
-
-**$http\_{name}**
-
-Request header field in snakecase
-
-e.g.
-
-`$http_user_agent` returns client header `User-Agent`
-
-### Interpolation
-
-Expressions encaptured by `${` and `}` in `body` field will be interpolated.
-
-**Basic**
-
-`"${'string field'}"` => `"string field"`
-
-`${1 + 1}` => `2`
-
-`"${'\{using curly braces inside interpolation\}'}"` => `"{using curly braces inside interpolation}"`
-
-
-**Accessing `params`, `query`, `body` and `headers`**
-
-> `params` keeps the passed-in parameters in route url, `query` stores request query string values, `body` and `headers` hold request body and headers respectively
-
-*Definition: /api/v1/items/:id*
-
-*Request URL: /api/v1/items/12?color=red*
-
-*Request Headers: {'x-version':'1.31'}*
-
-*Request body: '{"count": 9}'*
-
-`${params.id}` => `12`
-
-`${query.color}` => `"red"`
-
-`${body.data}` => `{"count": 9}`
-
-`${headers['x-version']}` => `"1.31"`
-
-**Faking data**
-
-> `faker` is a [thirdparty library](http://marak.github.io/faker.js)
-
-`${faker.random.number()}` => `1289`
-
-`${faker.random.number}` => `4096`
-
-> the first example calls a function and returns the result
-
-> the second example returns a function which will be called without context
-
-`"${faker.name.firstName}"` => `"James"`
-
-> `$faker` is an additional function which can be called to use a specific locale(for the current context only)
-
-`"${$faker('zh_CN').name.firstName}"` => `"朱"`
-
-> see **[faker](http://marak.github.io/faker.js)** for reference
-
+See [mockit-express](https://github.com/seancheung/mockit-express#config)
 
 ## Integrate into Express
 
-```javascript
-const mockit = require('mockit');
-// create an express router
-const router = mockit('/path/to/routes.yml');
-app.use('/ap1/mock', router);
-```
-
-```javascript
-// to enable file change watcher auto reload
-const router = mockit('/path/to/routes.yml', true);
-```
+See [mockit-express](https://www.npmjs.com/package/mockit-express)
 
 ## Test
 

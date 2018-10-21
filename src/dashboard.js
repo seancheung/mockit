@@ -1,6 +1,6 @@
 const express = require('express');
 
-module.exports = (app, config, db, target, ...plugins) => {
+module.exports = (app, config, db, ...plugins) => {
     const dashboard = express.Router({ mergeParams: true });
 
     if (plugins) {
@@ -86,7 +86,6 @@ module.exports = (app, config, db, target, ...plugins) => {
                 error.status = 500;
                 throw error;
             }
-            target.reload();
             res.status(201).end();
         } catch (error) {
             next(error);
@@ -146,7 +145,6 @@ module.exports = (app, config, db, target, ...plugins) => {
                 error.status = 500;
                 throw error;
             }
-            target.reload();
             res.json(doc);
         } catch (error) {
             next(error);
@@ -160,7 +158,6 @@ module.exports = (app, config, db, target, ...plugins) => {
                 error.status = 404;
                 throw error;
             }
-            target.reload();
             res.status(204).end();
         } catch (error) {
             next(error);
