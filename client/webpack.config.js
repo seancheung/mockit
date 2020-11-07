@@ -6,7 +6,7 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 module.exports = mode => ({
     mode,
     entry: {
-        main: path.resolve(__dirname, './index.jsx')
+        main: [path.resolve(__dirname, './index.jsx')]
     },
     output: {
         filename: '[name].js',
@@ -68,5 +68,20 @@ module.exports = mode => ({
                     extractComments: true
                 })
             ])
-    ]
+    ],
+    devServer: {
+        contentBase: path.resolve(__dirname, '../www'),
+        after: function(app) {
+            const mockit = require('mockit-express');
+            const db = new mockit.Database();
+            const yaml = require('fs').readFileSync(path.resolve(__dirname, '../template.yml'));
+            const template = require('js-yaml').safeLoad(yaml);
+            const bodyParser = require('body-parser');
+            require('../src/dashboard')(app, { template }, db, router => {
+                router.use(bodyParser.json());
+                router.use(bodyParser.urlencoded({ extended: false }));
+            });
+            app.use(mockit(db));
+        }
+    }
 });
