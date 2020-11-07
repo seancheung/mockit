@@ -6,7 +6,7 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 module.exports = mode => ({
     mode,
     entry: {
-        main: [path.resolve(__dirname, './index.jsx')]
+        main: ['@babel/polyfill', path.resolve(__dirname, './index.jsx')]
     },
     output: {
         filename: '[name].js',
@@ -20,7 +20,7 @@ module.exports = mode => ({
                 use: [
                     {
                         loader: 'babel-loader',
-                        options: { presets: ['react', 'env'] }
+                        options: { presets: ['@babel/preset-env', '@babel/preset-react'] }
                     }
                 ]
             },

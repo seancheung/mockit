@@ -1,7 +1,6 @@
 import React from 'react';
 import List from '@material-ui/core/List';
 import Zoom from '@material-ui/core/Zoom';
-import Button from '@material-ui/core/Button';
 import Avatar from '@material-ui/core/Avatar';
 import AddIcon from '@material-ui/icons/Add';
 import EditIcon from '@material-ui/icons/Edit';
@@ -16,13 +15,14 @@ import PublicIcon from '@material-ui/icons/Public';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
+import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import ListItemText from '@material-ui/core/ListItemText';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import ExpansionPanel from '@material-ui/core/ExpansionPanel';
-import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
-import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
-import ExpansionPanelActions from '@material-ui/core/ExpansionPanelActions';
+import AccordionPanel from '@material-ui/core/Accordion';
+import AccordionPanelSummary from '@material-ui/core/AccordionSummary';
+import AccordionPanelDetails from '@material-ui/core/AccordionDetails';
+import AccordionPanelActions from '@material-ui/core/AccordionActions';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import grey from '@material-ui/core/colors/grey';
 import withStyles from '@material-ui/core/styles/withStyles';
@@ -44,19 +44,19 @@ const styles = theme => ({
         display: 'block'
     },
     listItem: {
-        paddingLeft: theme.spacing.unit * 3,
-        paddingRight: theme.spacing.unit * 3,
-        paddingTop: theme.spacing.unit * 1.5,
-        paddingBottom: theme.spacing.unit * 1.5
+        paddingLeft: theme.spacing(3),
+        paddingRight: theme.spacing(3),
+        paddingTop: theme.spacing(1.5),
+        paddingBottom: theme.spacing(1.5)
     },
     bodyEditor: {
-        marginLeft: theme.spacing.unit * 10
+        marginLeft: theme.spacing(10)
     },
     listNested: {
-        paddingLeft: theme.spacing.unit * 10
+        paddingLeft: theme.spacing(10)
     },
     spacing: {
-        marginBottom: theme.spacing.unit * 4
+        marginBottom: theme.spacing(4)
     },
     url: {
         width: '90%'
@@ -72,7 +72,7 @@ const styles = theme => ({
         right: '0px'
     },
     label: {
-        padding: `0 ${theme.spacing.unit * 2}px`
+        padding: `0 ${theme.spacing(2)}px`
     }
 });
 
@@ -97,14 +97,18 @@ export const View = ({
     toggleHeadersHandler
 }) => (
     <React.Fragment>
-        <ExpansionPanelDetails className={classes.details}>
+        <AccordionPanelDetails className={classes.details}>
             <List>
                 <ListItem>
-                    <Avatar>C</Avatar>
+                    <ListItemAvatar>
+                        <Avatar>C</Avatar>
+                    </ListItemAvatar>
                     <ListItemText primary="Status Code" secondary={code} />
                 </ListItem>
                 <ListItem>
-                    <Avatar>D</Avatar>
+                    <ListItemAvatar>
+                        <Avatar>D</Avatar>
+                    </ListItemAvatar>
                     <ListItemText primary="Delay(ms)" secondary={delay} />
                 </ListItem>
                 <ListItem
@@ -112,8 +116,10 @@ export const View = ({
                     button
                     onClick={toggleHeadersHandler}
                 >
-                    <Avatar>H</Avatar>
-                    <ListItemText inset primary="Headers" />
+                    <ListItemAvatar>
+                        <Avatar>H</Avatar>
+                    </ListItemAvatar>
+                    <ListItemText primary="Headers" />
                     {headersExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                 </ListItem>
                 <Collapse in={headersExpanded} timeout="auto" unmountOnExit>
@@ -130,8 +136,10 @@ export const View = ({
                     </List>
                 </Collapse>
                 <ListItem disabled={!body} button onClick={toggleBodyHandler}>
-                    <Avatar>B</Avatar>
-                    <ListItemText inset primary="Body" />
+                    <ListItemAvatar>
+                        <Avatar>B</Avatar>
+                    </ListItemAvatar>
+                    <ListItemText primary="Body" />
                     {bodyExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                 </ListItem>
                 <Collapse in={bodyExpanded} timeout="auto" unmountOnExit>
@@ -151,34 +159,34 @@ export const View = ({
                     />
                 </Collapse>
             </List>
-        </ExpansionPanelDetails>
+        </AccordionPanelDetails>
         <Divider />
-        <ExpansionPanelActions>
+        <AccordionPanelActions>
             <Zoom in={expanded} unmountOnExit timeout={transition}>
-                <Button
+                <IconButton
                     className={classes.button}
-                    variant="fab"
-                    mini
+                    variant="contained"
+                    size="small"
                     color="primary"
                     aria-label="Edit"
                     onClick={editHandler.bind(null, true)}
                 >
                     <EditIcon />
-                </Button>
+                </IconButton>
             </Zoom>
             <Zoom in={expanded} unmountOnExit timeout={transition}>
-                <Button
+                <IconButton
                     className={classes.button}
-                    variant="fab"
-                    mini
+                    variant="contained"
+                    size="small"
                     color="secondary"
                     aria-label="Delete"
                     onClick={deleteHandler}
                 >
                     <DeleteIcon />
-                </Button>
+                </IconButton>
             </Zoom>
-        </ExpansionPanelActions>
+        </AccordionPanelActions>
     </React.Fragment>
 );
 
@@ -201,7 +209,7 @@ export const Edit = ({
     deleteHeaderHandler
 }) => (
     <React.Fragment>
-        <ExpansionPanelDetails className={classes.details}>
+        <AccordionPanelDetails className={classes.details}>
             <TextField
                 select
                 label="Status Code"
@@ -296,34 +304,34 @@ export const Edit = ({
                     </ListItem>
                 ))}
             </List>
-        </ExpansionPanelDetails>
+        </AccordionPanelDetails>
         <Divider />
-        <ExpansionPanelActions>
+        <AccordionPanelActions>
             <Zoom in={expanded} unmountOnExit timeout={transition}>
-                <Button
+                <IconButton
                     className={classes.button}
-                    variant="fab"
-                    mini
+                    variant="contained"
+                    size="small"
                     color="primary"
                     aria-label="Complete"
                     onClick={updateHandler}
                 >
                     <CheckIcon />
-                </Button>
+                </IconButton>
             </Zoom>
             <Zoom in={expanded} unmountOnExit timeout={transition}>
-                <Button
+                <IconButton
                     className={classes.button}
-                    variant="fab"
-                    mini
+                    variant="contained"
+                    size="small"
                     color="secondary"
                     aria-label="Cancel"
                     onClick={cancelHandler.bind(null, false)}
                 >
                     <CancelIcon />
-                </Button>
+                </IconButton>
             </Zoom>
-        </ExpansionPanelActions>
+        </AccordionPanelActions>
     </React.Fragment>
 );
 
@@ -340,14 +348,18 @@ export const ProxyView = ({
     toggleHeadersHandler
 }) => (
     <React.Fragment>
-        <ExpansionPanelDetails className={classes.details}>
+        <AccordionPanelDetails className={classes.details}>
             <List>
                 <ListItem>
-                    <Avatar>R</Avatar>
+                    <ListItemAvatar>
+                        <Avatar>R</Avatar>
+                    </ListItemAvatar>
                     <ListItemText primary="Remote" secondary={remote} />
                 </ListItem>
                 <ListItem>
-                    <Avatar>W</Avatar>
+                    <ListItemAvatar>
+                        <Avatar>W</Avatar>
+                    </ListItemAvatar>
                     <ListItemText primary="Rewrite" secondary={rewrite} />
                 </ListItem>
                 <ListItem
@@ -355,8 +367,10 @@ export const ProxyView = ({
                     button
                     onClick={toggleHeadersHandler}
                 >
-                    <Avatar>H</Avatar>
-                    <ListItemText inset primary="Headers" />
+                    <ListItemAvatar>
+                        <Avatar>H</Avatar>
+                    </ListItemAvatar>
+                    <ListItemText primary="Headers" />
                     {headersExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                 </ListItem>
                 <Collapse in={headersExpanded} timeout="auto" unmountOnExit>
@@ -373,34 +387,34 @@ export const ProxyView = ({
                     </List>
                 </Collapse>
             </List>
-        </ExpansionPanelDetails>
+        </AccordionPanelDetails>
         <Divider />
-        <ExpansionPanelActions>
+        <AccordionPanelActions>
             <Zoom in={expanded} unmountOnExit timeout={transition}>
-                <Button
+                <IconButton
                     className={classes.button}
-                    variant="fab"
-                    mini
+                    variant="contained"
+                    size="small"
                     color="primary"
                     aria-label="Edit"
                     onClick={editHandler.bind(null, true)}
                 >
                     <EditIcon />
-                </Button>
+                </IconButton>
             </Zoom>
             <Zoom in={expanded} unmountOnExit timeout={transition}>
-                <Button
+                <IconButton
                     className={classes.button}
-                    variant="fab"
-                    mini
+                    variant="contained"
+                    size="small"
                     color="secondary"
                     aria-label="Delete"
                     onClick={deleteHandler}
                 >
                     <DeleteIcon />
-                </Button>
+                </IconButton>
             </Zoom>
-        </ExpansionPanelActions>
+        </AccordionPanelActions>
     </React.Fragment>
 );
 
@@ -421,7 +435,7 @@ export const ProxyEdit = ({
     deleteHeaderHandler
 }) => (
     <React.Fragment>
-        <ExpansionPanelDetails className={classes.details}>
+        <AccordionPanelDetails className={classes.details}>
             <TextField
                 label="Remote"
                 margin="normal"
@@ -503,34 +517,34 @@ export const ProxyEdit = ({
                     </ListItem>
                 ))}
             </List>
-        </ExpansionPanelDetails>
+        </AccordionPanelDetails>
         <Divider />
-        <ExpansionPanelActions>
+        <AccordionPanelActions>
             <Zoom in={expanded} unmountOnExit timeout={transition}>
-                <Button
+                <IconButton
                     className={classes.button}
-                    variant="fab"
-                    mini
+                    variant="contained"
+                    size="small"
                     color="primary"
                     aria-label="Complete"
                     onClick={updateHandler}
                 >
                     <CheckIcon />
-                </Button>
+                </IconButton>
             </Zoom>
             <Zoom in={expanded} unmountOnExit timeout={transition}>
-                <Button
+                <IconButton
                     className={classes.button}
-                    variant="fab"
-                    mini
+                    variant="contained"
+                    size="small"
                     color="secondary"
                     aria-label="Cancel"
                     onClick={cancelHandler.bind(null, false)}
                 >
                     <CancelIcon />
-                </Button>
+                </IconButton>
             </Zoom>
-        </ExpansionPanelActions>
+        </AccordionPanelActions>
     </React.Fragment>
 );
 
@@ -550,18 +564,18 @@ export class Route extends React.Component {
 
     render() {
         return (
-            <ExpansionPanel
+            <AccordionPanel
                 onChange={(e, expanded) => this.setState({ expanded })}
             >
-                <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                <AccordionPanelSummary expandIcon={<ExpandMoreIcon />}>
                     <Typography
-                        variant="subheading"
+                        variant="subtitle1"
                         className={this.props.classes.flex}
                     >{`${this.props.data.method.toUpperCase()} ${
                             this.props.data.path
                         }`}</Typography>
                     {this.state.proxy ? <PublicIcon color="primary" /> : null}
-                </ExpansionPanelSummary>
+                </AccordionPanelSummary>
                 {this.state.edit ? (
                     this.state.proxy ? (
                         <ProxyEdit
@@ -640,7 +654,7 @@ export class Route extends React.Component {
                         toggleBodyHandler={this.handleToggleBody.bind(this)}
                     />
                 )}
-            </ExpansionPanel>
+            </AccordionPanel>
         );
     }
 

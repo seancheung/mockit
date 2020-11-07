@@ -14,7 +14,7 @@ import { pluck } from './store/utils';
 
 const styles = theme => ({
     list: {
-        padding: theme.spacing.unit * 2,
+        padding: theme.spacing(2),
         height: '85vh',
         overflow: 'auto'
     },
