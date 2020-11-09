@@ -5,7 +5,7 @@
     "scripts": {
         "test": "mocha test/*.spec.js",
         "build": "webpack --config ./client/webpack.config.js --mode=production",
-        "dev": "webpack serve --config ./client/webpack.config.js --mode=development --open=true"
+        "dev": "webpack serve --config ./dashboard/webpack.config.js --mode=development --open=true"
     },
     "main": "./src/plugin.js",
     "types": "mockit.d.ts",
