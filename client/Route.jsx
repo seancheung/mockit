@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import List from '@material-ui/core/List';
 import Zoom from '@material-ui/core/Zoom';
 import Avatar from '@material-ui/core/Avatar';
@@ -81,114 +81,124 @@ const transition = {
     exit: 200
 };
 
+export const ContentView = ({ classes, code, delay, body, headers }) => {
+    const [headersExpanded, setHeadersExpanded] = useState(false);
+    const [bodyExpanded, setBodyExpanded] = useState(false);
+    const toggleHeadersHandler = () => setHeadersExpanded(!headersExpanded);
+    const toggleBodyHandler = () => setBodyExpanded(!bodyExpanded);
+    return (
+        <React.Fragment>
+            <ListItem>
+                <ListItemAvatar>
+                    <Avatar>C</Avatar>
+                </ListItemAvatar>
+                <ListItemText primary="Status Code" secondary={code} />
+            </ListItem>
+            <ListItem>
+                <ListItemAvatar>
+                    <Avatar>D</Avatar>
+                </ListItemAvatar>
+                <ListItemText primary="Delay(ms)" secondary={delay} />
+            </ListItem>
+            <ListItem disabled={!headers} button onClick={toggleHeadersHandler}>
+                <ListItemAvatar>
+                    <Avatar>H</Avatar>
+                </ListItemAvatar>
+                <ListItemText primary="Headers" />
+                {headersExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+            </ListItem>
+            <Collapse in={headersExpanded} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding>
+                    {headers &&
+                        Object.entries(headers).map(([k, v]) => (
+                            <ListItem key={k} className={classes.listNested}>
+                                <ListItemText primary={k} secondary={v} />
+                            </ListItem>
+                        ))}
+                </List>
+            </Collapse>
+            <ListItem disabled={!body} button onClick={toggleBodyHandler}>
+                <ListItemAvatar>
+                    <Avatar>B</Avatar>
+                </ListItemAvatar>
+                <ListItemText primary="Body" />
+                {bodyExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+            </ListItem>
+            <Collapse in={bodyExpanded} timeout="auto" unmountOnExit>
+                <AceEditor
+                    className={classes.bodyEditor}
+                    mode="json"
+                    theme="github"
+                    readOnly={true}
+                    showGutter={false}
+                    wrapEnabled={true}
+                    showPrintMargin={false}
+                    highlightActiveLine={false}
+                    editorProps={{ $blockScrolling: true }}
+                    value={body}
+                    height="300px"
+                    width="80%"
+                />
+            </Collapse>
+        </React.Fragment>
+    );
+};
+
 export const View = ({
     classes,
     code,
     delay,
     body,
+    cond,
     headers,
     expanded,
     transition,
     editHandler,
-    deleteHandler,
-    headersExpanded,
-    bodyExpanded,
-    toggleBodyHandler,
-    toggleHeadersHandler
-}) => (
-    <React.Fragment>
-        <AccordionPanelDetails className={classes.details}>
-            <List>
-                <ListItem>
-                    <ListItemAvatar>
-                        <Avatar>C</Avatar>
-                    </ListItemAvatar>
-                    <ListItemText primary="Status Code" secondary={code} />
-                </ListItem>
-                <ListItem>
-                    <ListItemAvatar>
-                        <Avatar>D</Avatar>
-                    </ListItemAvatar>
-                    <ListItemText primary="Delay(ms)" secondary={delay} />
-                </ListItem>
-                <ListItem
-                    disabled={!headers}
-                    button
-                    onClick={toggleHeadersHandler}
-                >
-                    <ListItemAvatar>
-                        <Avatar>H</Avatar>
-                    </ListItemAvatar>
-                    <ListItemText primary="Headers" />
-                    {headersExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                </ListItem>
-                <Collapse in={headersExpanded} timeout="auto" unmountOnExit>
-                    <List component="div" disablePadding>
-                        {headers &&
-                            Object.entries(headers).map(([k, v]) => (
-                                <ListItem
-                                    key={k}
-                                    className={classes.listNested}
-                                >
-                                    <ListItemText primary={k} secondary={v} />
-                                </ListItem>
-                            ))}
-                    </List>
-                </Collapse>
-                <ListItem disabled={!body} button onClick={toggleBodyHandler}>
-                    <ListItemAvatar>
-                        <Avatar>B</Avatar>
-                    </ListItemAvatar>
-                    <ListItemText primary="Body" />
-                    {bodyExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                </ListItem>
-                <Collapse in={bodyExpanded} timeout="auto" unmountOnExit>
-                    <AceEditor
-                        className={classes.bodyEditor}
-                        mode="json"
-                        theme="github"
-                        readOnly={true}
-                        showGutter={false}
-                        wrapEnabled={true}
-                        showPrintMargin={false}
-                        highlightActiveLine={false}
-                        editorProps={{ $blockScrolling: true }}
-                        value={body}
-                        height="300px"
-                        width="80%"
+    deleteHandler
+}) => {
+    return (
+        <React.Fragment>
+            <AccordionPanelDetails className={classes.details}>
+                <List>
+                    <ContentView
+                        code={code}
+                        delay={delay}
+                        body={body}
+                        headers={headers}
+                        classes={classes}
                     />
-                </Collapse>
-            </List>
-        </AccordionPanelDetails>
-        <Divider />
-        <AccordionPanelActions>
-            <Zoom in={expanded} unmountOnExit timeout={transition}>
-                <IconButton
-                    className={classes.button}
-                    variant="contained"
-                    size="small"
-                    color="primary"
-                    aria-label="Edit"
-                    onClick={editHandler.bind(null, true)}
-                >
-                    <EditIcon />
-                </IconButton>
-            </Zoom>
-            <Zoom in={expanded} unmountOnExit timeout={transition}>
-                <IconButton
-                    className={classes.button}
-                    variant="contained"
-                    size="small"
-                    color="secondary"
-                    aria-label="Delete"
-                    onClick={deleteHandler}
-                >
-                    <DeleteIcon />
-                </IconButton>
-            </Zoom>
-        </AccordionPanelActions>
-    </React.Fragment>
-);
+                </List>
+            </AccordionPanelDetails>
+            <Divider />
+            <AccordionPanelActions>
+                <Zoom in={expanded} unmountOnExit timeout={transition}>
+                    <IconButton
+                        className={classes.button}
+                        variant="contained"
+                        size="small"
+                        color="primary"
+                        aria-label="Edit"
+                        onClick={editHandler.bind(null, true)}
+                    >
+                        <EditIcon />
+                    </IconButton>
+                </Zoom>
+                <Zoom in={expanded} unmountOnExit timeout={transition}>
+                    <IconButton
+                        className={classes.button}
+                        variant="contained"
+                        size="small"
+                        color="secondary"
+                        aria-label="Delete"
+                        onClick={deleteHandler}
+                    >
+                        <DeleteIcon />
+                    </IconButton>
+                </Zoom>
+            </AccordionPanelActions>
+        </React.Fragment>
+    );
+};
 
 export const Edit = ({
     classes,
@@ -202,138 +212,148 @@ export const Edit = ({
     changeHandler,
     updateHandler,
     cancelHandler,
-    newHeader,
-    newHeaderChangeHandler,
-    addHeaderHandler,
     headerChangeHandler,
     deleteHeaderHandler
-}) => (
-    <React.Fragment>
-        <AccordionPanelDetails className={classes.details}>
-            <TextField
-                select
-                label="Status Code"
-                margin="normal"
-                className={classNames(classes.field, classes.spacing)}
-                SelectProps={{
-                    MenuProps: {
-                        className: classes.menu
-                    }
-                }}
-                value={code}
-                onChange={e => changeHandler('code', e.target.value)}
-            >
-                {Object.entries(template.codes).map(([k, v]) => (
-                    <MenuItem key={k} value={parseInt(k)}>
-                        {k} {v}
-                    </MenuItem>
-                ))}
-            </TextField>
-            <TextField
-                label="Delay(ms)"
-                margin="normal"
-                type="number"
-                className={classNames(classes.field, classes.spacing)}
-                value={delay}
-                onChange={e => changeHandler('delay', e.target.value)}
-            />
-            <Typography variant="caption" gutterBottom>
-                Body
-            </Typography>
-            <AceEditor
-                mode={typeToMode(headers['Content-Type'])}
-                theme="github"
-                className={classes.spacing}
-                showPrintMargin={false}
-                onChange={value => changeHandler('body', value)}
-                editorProps={{ $blockScrolling: true }}
-                value={body}
-                height="300px"
-                width="80%"
-            />
-            <Typography variant="caption" gutterBottom>
-                Headers
-            </Typography>
-            <List disablePadding className={classes.spacing}>
-                <ListItem key={'__new'}>
-                    <TextField
-                        label="Key"
-                        value={newHeader.key}
-                        onChange={e =>
-                            newHeaderChangeHandler('key', e.target.value)
+}) => {
+    const [newHeader, setNewHeader] = useState({ key: '', value: '' });
+    const addHeaderHandler = () => {
+        headerChangeHandler(newHeader.key, newHeader.value);
+        setNewHeader({ key: '', value: '' });
+    };
+    return (
+        <React.Fragment>
+            <AccordionPanelDetails className={classes.details}>
+                <TextField
+                    select
+                    label="Status Code"
+                    margin="normal"
+                    className={classNames(classes.field, classes.spacing)}
+                    SelectProps={{
+                        MenuProps: {
+                            className: classes.menu
                         }
-                    />
-                    <TextField
-                        label="Value"
-                        value={newHeader.value}
-                        onChange={e =>
-                            newHeaderChangeHandler('value', e.target.value)
-                        }
-                    />
-                    <ListItemSecondaryAction>
-                        <IconButton
-                            aria-label="Add"
-                            onClick={addHeaderHandler}
-                            disabled={
-                                !newHeader.key ||
-                                !newHeader.value ||
-                                headers[newHeader.key] != null
-                            }
-                        >
-                            <AddIcon />
-                        </IconButton>
-                    </ListItemSecondaryAction>
-                </ListItem>
-                {Object.entries(headers).map(([k, v]) => (
-                    <ListItem key={k}>
+                    }}
+                    value={code}
+                    onChange={e => changeHandler('code', e.target.value)}
+                >
+                    {Object.entries(template.codes).map(([k, v]) => (
+                        <MenuItem key={k} value={parseInt(k)}>
+                            {k} {v}
+                        </MenuItem>
+                    ))}
+                </TextField>
+                <TextField
+                    label="Delay(ms)"
+                    margin="normal"
+                    type="number"
+                    className={classNames(classes.field, classes.spacing)}
+                    value={delay}
+                    onChange={e => changeHandler('delay', e.target.value)}
+                />
+                <Typography variant="caption" gutterBottom>
+                    Body
+                </Typography>
+                <AceEditor
+                    mode={typeToMode(headers['Content-Type'])}
+                    theme="github"
+                    className={classes.spacing}
+                    showPrintMargin={false}
+                    onChange={value => changeHandler('body', value)}
+                    editorProps={{ $blockScrolling: true }}
+                    value={body}
+                    height="300px"
+                    width="80%"
+                />
+                <Typography variant="caption" gutterBottom>
+                    Headers
+                </Typography>
+                <List disablePadding className={classes.spacing}>
+                    <ListItem key={'__new'}>
                         <TextField
-                            label={k}
-                            value={v}
+                            label="Key"
+                            value={newHeader.key}
                             onChange={e =>
-                                headerChangeHandler(k, e.target.value)
+                                setNewHeader({
+                                    ...newHeader,
+                                    key: e.target.value
+                                })
+                            }
+                        />
+                        <TextField
+                            label="Value"
+                            value={newHeader.value}
+                            onChange={e =>
+                                setNewHeader({
+                                    ...newHeader,
+                                    value: e.target.value
+                                })
                             }
                         />
                         <ListItemSecondaryAction>
                             <IconButton
-                                aria-label="Delete"
-                                onClick={deleteHeaderHandler.bind(null, k)}
+                                aria-label="Add"
+                                onClick={addHeaderHandler}
+                                disabled={
+                                    !newHeader.key ||
+                                    !newHeader.value ||
+                                    headers[newHeader.key] != null
+                                }
                             >
-                                <DeleteIcon />
+                                <AddIcon />
                             </IconButton>
                         </ListItemSecondaryAction>
                     </ListItem>
-                ))}
-            </List>
-        </AccordionPanelDetails>
-        <Divider />
-        <AccordionPanelActions>
-            <Zoom in={expanded} unmountOnExit timeout={transition}>
-                <IconButton
-                    className={classes.button}
-                    variant="contained"
-                    size="small"
-                    color="primary"
-                    aria-label="Complete"
-                    onClick={updateHandler}
-                >
-                    <CheckIcon />
-                </IconButton>
-            </Zoom>
-            <Zoom in={expanded} unmountOnExit timeout={transition}>
-                <IconButton
-                    className={classes.button}
-                    variant="contained"
-                    size="small"
-                    color="secondary"
-                    aria-label="Cancel"
-                    onClick={cancelHandler.bind(null, false)}
-                >
-                    <CancelIcon />
-                </IconButton>
-            </Zoom>
-        </AccordionPanelActions>
-    </React.Fragment>
-);
+                    {Object.entries(headers).map(([k, v]) => (
+                        <ListItem key={k}>
+                            <TextField
+                                label={k}
+                                value={v}
+                                onChange={e =>
+                                    headerChangeHandler(k, e.target.value)
+                                }
+                            />
+                            <ListItemSecondaryAction>
+                                <IconButton
+                                    aria-label="Delete"
+                                    onClick={deleteHeaderHandler.bind(null, k)}
+                                >
+                                    <DeleteIcon />
+                                </IconButton>
+                            </ListItemSecondaryAction>
+                        </ListItem>
+                    ))}
+                </List>
+            </AccordionPanelDetails>
+            <Divider />
+            <AccordionPanelActions>
+                <Zoom in={expanded} unmountOnExit timeout={transition}>
+                    <IconButton
+                        className={classes.button}
+                        variant="contained"
+                        size="small"
+                        color="primary"
+                        aria-label="Complete"
+                        onClick={updateHandler}
+                    >
+                        <CheckIcon />
+                    </IconButton>
+                </Zoom>
+                <Zoom in={expanded} unmountOnExit timeout={transition}>
+                    <IconButton
+                        className={classes.button}
+                        variant="contained"
+                        size="small"
+                        color="secondary"
+                        aria-label="Cancel"
+                        onClick={cancelHandler.bind(null, false)}
+                    >
+                        <CancelIcon />
+                    </IconButton>
+                </Zoom>
+            </AccordionPanelActions>
+        </React.Fragment>
+    );
+};
 
 export const ProxyView = ({
     classes,
@@ -343,80 +363,89 @@ export const ProxyView = ({
     expanded,
     transition,
     editHandler,
-    deleteHandler,
-    headersExpanded,
-    toggleHeadersHandler
-}) => (
-    <React.Fragment>
-        <AccordionPanelDetails className={classes.details}>
-            <List>
-                <ListItem>
-                    <ListItemAvatar>
-                        <Avatar>R</Avatar>
-                    </ListItemAvatar>
-                    <ListItemText primary="Remote" secondary={remote} />
-                </ListItem>
-                <ListItem>
-                    <ListItemAvatar>
-                        <Avatar>W</Avatar>
-                    </ListItemAvatar>
-                    <ListItemText primary="Rewrite" secondary={rewrite} />
-                </ListItem>
-                <ListItem
-                    disabled={!headers}
-                    button
-                    onClick={toggleHeadersHandler}
-                >
-                    <ListItemAvatar>
-                        <Avatar>H</Avatar>
-                    </ListItemAvatar>
-                    <ListItemText primary="Headers" />
-                    {headersExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                </ListItem>
-                <Collapse in={headersExpanded} timeout="auto" unmountOnExit>
-                    <List component="div" disablePadding>
-                        {headers &&
-                            Object.entries(headers).map(([k, v]) => (
-                                <ListItem
-                                    key={k}
-                                    className={classes.listNested}
-                                >
-                                    <ListItemText primary={k} secondary={v} />
-                                </ListItem>
-                            ))}
-                    </List>
-                </Collapse>
-            </List>
-        </AccordionPanelDetails>
-        <Divider />
-        <AccordionPanelActions>
-            <Zoom in={expanded} unmountOnExit timeout={transition}>
-                <IconButton
-                    className={classes.button}
-                    variant="contained"
-                    size="small"
-                    color="primary"
-                    aria-label="Edit"
-                    onClick={editHandler.bind(null, true)}
-                >
-                    <EditIcon />
-                </IconButton>
-            </Zoom>
-            <Zoom in={expanded} unmountOnExit timeout={transition}>
-                <IconButton
-                    className={classes.button}
-                    variant="contained"
-                    size="small"
-                    color="secondary"
-                    aria-label="Delete"
-                    onClick={deleteHandler}
-                >
-                    <DeleteIcon />
-                </IconButton>
-            </Zoom>
-        </AccordionPanelActions>
-    </React.Fragment>
-);
+    deleteHandler
+}) => {
+    const [headersExpanded, setHeadersExpanded] = useState(false);
+    const toggleHeadersHandler = () => setHeadersExpanded(!headersExpanded);
+    return (
+        <React.Fragment>
+            <AccordionPanelDetails className={classes.details}>
+                <List>
+                    <ListItem>
+                        <ListItemAvatar>
+                            <Avatar>R</Avatar>
+                        </ListItemAvatar>
+                        <ListItemText primary="Remote" secondary={remote} />
+                    </ListItem>
+                    <ListItem>
+                        <ListItemAvatar>
+                            <Avatar>W</Avatar>
+                        </ListItemAvatar>
+                        <ListItemText primary="Rewrite" secondary={rewrite} />
+                    </ListItem>
+                    <ListItem
+                        disabled={!headers}
+                        button
+                        onClick={toggleHeadersHandler}
+                    >
+                        <ListItemAvatar>
+                            <Avatar>H</Avatar>
+                        </ListItemAvatar>
+                        <ListItemText primary="Headers" />
+                        {headersExpanded ? (
+                            <ExpandLessIcon />
+                        ) : (
+                            <ExpandMoreIcon />
+                        )}
+                    </ListItem>
+                    <Collapse in={headersExpanded} timeout="auto" unmountOnExit>
+                        <List component="div" disablePadding>
+                            {headers &&
+                                Object.entries(headers).map(([k, v]) => (
+                                    <ListItem
+                                        key={k}
+                                        className={classes.listNested}
+                                    >
+                                        <ListItemText
+                                            primary={k}
+                                            secondary={v}
+                                        />
+                                    </ListItem>
+                                ))}
+                        </List>
+                    </Collapse>
+                </List>
+            </AccordionPanelDetails>
+            <Divider />
+            <AccordionPanelActions>
+                <Zoom in={expanded} unmountOnExit timeout={transition}>
+                    <IconButton
+                        className={classes.button}
+                        variant="contained"
+                        size="small"
+                        color="primary"
+                        aria-label="Edit"
+                        onClick={editHandler.bind(null, true)}
+                    >
+                        <EditIcon />
+                    </IconButton>
+                </Zoom>
+                <Zoom in={expanded} unmountOnExit timeout={transition}>
+                    <IconButton
+                        className={classes.button}
+                        variant="contained"
+                        size="small"
+                        color="secondary"
+                        aria-label="Delete"
+                        onClick={deleteHandler}
+                    >
+                        <DeleteIcon />
+                    </IconButton>
+                </Zoom>
+            </AccordionPanelActions>
+        </React.Fragment>
+    );
+};
 
 export const ProxyEdit = ({
     classes,
@@ -428,362 +457,287 @@ export const ProxyEdit = ({
     changeHandler,
     updateHandler,
     cancelHandler,
-    newHeader,
-    newHeaderChangeHandler,
-    addHeaderHandler,
     headerChangeHandler,
     deleteHeaderHandler
-}) => (
-    <React.Fragment>
-        <AccordionPanelDetails className={classes.details}>
-            <TextField
-                label="Remote"
-                margin="normal"
-                className={classNames(
-                    classes.field,
-                    classes.spacing,
-                    classes.url
-                )}
-                value={remote}
-                onChange={e => changeHandler('remote', e.target.value)}
-                fullWidth
-            />
-            <TextField
-                label="Rewrite"
-                margin="normal"
-                className={classNames(
-                    classes.field,
-                    classes.spacing,
-                    classes.url
-                )}
-                value={rewrite}
-                onChange={e => changeHandler('rewrite', e.target.value)}
-                fullWidth
-            />
-            <Typography
-                variant="caption"
-                gutterBottom
-                className={classes.label}
-            >
-                Headers
-            </Typography>
-            <List disablePadding className={classes.spacing}>
-                <ListItem key="__new">
-                    <TextField
-                        label="Key"
-                        value={newHeader.key}
-                        onChange={e =>
-                            newHeaderChangeHandler('key', e.target.value)
-                        }
-                    />
-                    <TextField
-                        label="Value"
-                        value={newHeader.value}
-                        onChange={e =>
-                            newHeaderChangeHandler('value', e.target.value)
-                        }
-                    />
-                    <ListItemSecondaryAction>
-                        <IconButton
-                            aria-label="Add"
-                            onClick={addHeaderHandler}
-                            disabled={
-                                !newHeader.key ||
-                                !newHeader.value ||
-                                headers[newHeader.key] != null
-                            }
-                        >
-                            <AddIcon />
-                        </IconButton>
-                    </ListItemSecondaryAction>
-                </ListItem>
-                {Object.entries(headers).map(([k, v]) => (
-                    <ListItem key={k}>
+}) => {
+    const [newHeader, setNewHeader] = useState({ key: '', value: '' });
+    const addHeaderHandler = () => {
+        headerChangeHandler(newHeader.key, newHeader.value);
+        setNewHeader({ key: '', value: '' });
+    };
+    return (
+        <React.Fragment>
+            <AccordionPanelDetails className={classes.details}>
+                <TextField
+                    label="Remote"
+                    margin="normal"
+                    className={classNames(
+                        classes.field,
+                        classes.spacing,
+                        classes.url
+                    )}
+                    value={remote}
+                    onChange={e => changeHandler('remote', e.target.value)}
+                    fullWidth
+                />
+                <TextField
+                    label="Rewrite"
+                    margin="normal"
+                    className={classNames(
+                        classes.field,
+                        classes.spacing,
+                        classes.url
+                    )}
+                    value={rewrite}
+                    onChange={e => changeHandler('rewrite', e.target.value)}
+                    fullWidth
+                />
+                <Typography
+                    variant="caption"
+                    gutterBottom
+                    className={classes.label}
+                >
+                    Headers
+                </Typography>
+                <List disablePadding className={classes.spacing}>
+                    <ListItem key="__new">
                         <TextField
-                            label={k}
-                            value={v}
+                            label="Key"
+                            value={newHeader.key}
                             onChange={e =>
-                                headerChangeHandler(k, e.target.value)
+                                setNewHeader({
+                                    ...newHeader,
+                                    key: e.target.value
+                                })
+                            }
+                        />
+                        <TextField
+                            label="Value"
+                            value={newHeader.value}
+                            onChange={e =>
+                                setNewHeader({
+                                    ...newHeader,
+                                    key: e.target.value
+                                })
                             }
                         />
                         <ListItemSecondaryAction>
                             <IconButton
-                                aria-label="Delete"
-                                onClick={deleteHeaderHandler.bind(null, k)}
+                                aria-label="Add"
+                                onClick={addHeaderHandler}
+                                disabled={
+                                    !newHeader.key ||
+                                    !newHeader.value ||
+                                    headers[newHeader.key] != null
+                                }
                             >
-                                <DeleteIcon />
+                                <AddIcon />
                             </IconButton>
                         </ListItemSecondaryAction>
                     </ListItem>
-                ))}
-            </List>
-        </AccordionPanelDetails>
-        <Divider />
-        <AccordionPanelActions>
-            <Zoom in={expanded} unmountOnExit timeout={transition}>
-                <IconButton
-                    className={classes.button}
-                    variant="contained"
-                    size="small"
-                    color="primary"
-                    aria-label="Complete"
-                    onClick={updateHandler}
-                >
-                    <CheckIcon />
-                </IconButton>
-            </Zoom>
-            <Zoom in={expanded} unmountOnExit timeout={transition}>
-                <IconButton
-                    className={classes.button}
-                    variant="contained"
-                    size="small"
-                    color="secondary"
-                    aria-label="Cancel"
-                    onClick={cancelHandler.bind(null, false)}
-                >
-                    <CancelIcon />
-                </IconButton>
-            </Zoom>
-        </AccordionPanelActions>
-    </React.Fragment>
-);
+                    {Object.entries(headers).map(([k, v]) => (
+                        <ListItem key={k}>
+                            <TextField
+                                label={k}
+                                value={v}
+                                onChange={e =>
+                                    headerChangeHandler(k, e.target.value)
+                                }
+                            />
+                            <ListItemSecondaryAction>
+                                <IconButton
+                                    aria-label="Delete"
+                                    onClick={deleteHeaderHandler.bind(null, k)}
+                                >
+                                    <DeleteIcon />
+                                </IconButton>
+                            </ListItemSecondaryAction>
+                        </ListItem>
+                    ))}
+                </List>
+            </AccordionPanelDetails>
+            <Divider />
+            <AccordionPanelActions>
+                <Zoom in={expanded} unmountOnExit timeout={transition}>
+                    <IconButton
+                        className={classes.button}
+                        variant="contained"
+                        size="small"
+                        color="primary"
+                        aria-label="Complete"
+                        onClick={updateHandler}
+                    >
+                        <CheckIcon />
+                    </IconButton>
+                </Zoom>
+                <Zoom in={expanded} unmountOnExit timeout={transition}>
+                    <IconButton
+                        className={classes.button}
+                        variant="contained"
+                        size="small"
+                        color="secondary"
+                        aria-label="Cancel"
+                        onClick={cancelHandler.bind(null, false)}
+                    >
+                        <CancelIcon />
+                    </IconButton>
+                </Zoom>
+            </AccordionPanelActions>
+        </React.Fragment>
+    );
+};
 
-export class Route extends React.Component {
+export const Route = ({
+    classes,
+    data,
+    template,
+    updateHandler,
+    deleteHandler
+}) => {
+    const [expanded, setExpanded] = useState(false);
+    const [edit, setEdit] = useState(false);
+    const [dirty, setDirty] = useState([]);
+    const [state, setState] = useState(data);
+    const isProxy = data.proxy;
 
-    constructor(props) {
-        super(props);
-        this.state = Object.assign({}, this.props.data, {
-            expanded: false,
-            edit: false,
-            headersExpanded: false,
-            bodyExpanded: false,
-            newHeader: { key: '', value: '' },
-            dirty: new Set()
-        });
-    }
+    const handleChange = (key, value) => {
+        if (isProxy) {
+            setState({
+                ...state,
+                proxy: {
+                    ...state.proxy,
+                    [key]: value
+                }
+            });
+            setDirty(new Set(dirty).add('proxy'));
+        } else {
+            setState({
+                ...state,
+                [key]: value
+            });
+            setDirty(new Set(dirty).add(key));
+        }
+    };
 
-    render() {
-        return (
-            <AccordionPanel
-                onChange={(e, expanded) => this.setState({ expanded })}
-            >
-                <AccordionPanelSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography
-                        variant="subtitle1"
-                        className={this.props.classes.flex}
-                    >{`${this.props.data.method.toUpperCase()} ${
-                            this.props.data.path
-                        }`}</Typography>
-                    {this.state.proxy ? <PublicIcon color="primary" /> : null}
-                </AccordionPanelSummary>
-                {this.state.edit ? (
-                    this.state.proxy ? (
-                        <ProxyEdit
-                            classes={this.props.classes}
-                            {...this.state.proxy}
-                            expanded={this.state.expanded}
-                            transition={transition}
-                            newHeader={this.state.newHeader}
-                            changeHandler={this.handleChange.bind(this)}
-                            updateHandler={this.handleUpdate.bind(this)}
-                            cancelHandler={this.handleCancel.bind(this)}
-                            newHeaderChangeHandler={this.handleNewHeaderChange.bind(
-                                this
-                            )}
-                            addHeaderHandler={this.handleAddNewHeader.bind(
-                                this
-                            )}
-                            headerChangeHandler={this.handleHeaderChange.bind(
-                                this
-                            )}
-                            deleteHeaderHandler={this.handleDeleteHeader.bind(
-                                this
-                            )}
-                        />
-                    ) : (
-                        <Edit
-                            classes={this.props.classes}
-                            template={this.props.template}
-                            {...this.state}
-                            expanded={this.state.expanded}
-                            transition={transition}
-                            newHeader={this.state.newHeader}
-                            changeHandler={this.handleChange.bind(this)}
-                            updateHandler={this.handleUpdate.bind(this)}
-                            cancelHandler={this.handleCancel.bind(this)}
-                            newHeaderChangeHandler={this.handleNewHeaderChange.bind(
-                                this
-                            )}
-                            addHeaderHandler={this.handleAddNewHeader.bind(
-                                this
-                            )}
-                            headerChangeHandler={this.handleHeaderChange.bind(
-                                this
-                            )}
-                            deleteHeaderHandler={this.handleDeleteHeader.bind(
-                                this
-                            )}
-                        />
+    const handleCancel = () => setEdit(false);
+    const handleEdit = () => setEdit(true);
+
+    const handleUpdate = async () => {
+        await updateHandler(state, Array.from(dirty));
+        setEdit(false);
+    };
+
+    const handleDelete = () => deleteHandler();
+
+    const handleHeaderChange = (key, value) => {
+        if (isProxy) {
+            setState({
+                ...state,
+                proxy: {
+                    ...state.proxy,
+                    headers: {
+                        ...state.proxy.headers,
+                        [key]: value
+                    }
+                }
+            });
+            setDirty(new Set(dirty).add('proxy'));
+        } else {
+            setState({
+                ...state,
+                headers: {
+                    ...state.headers,
+                    [key]: value
+                }
+            });
+            setDirty(new Set(dirty).add('headers'));
+        }
+    };
+
+    const handleDeleteHeader = key => {
+        if (isProxy) {
+            setState({
+                ...state,
+                proxy: {
+                    ...state.proxy,
+                    headers: Object.entries(state.proxy.headers).reduce(
+                        (t, [k, v]) =>
+                            key === k ? t : Object.assign(t, { [k]: v }),
+                        {}
                     )
-                ) : this.state.proxy ? (
-                    <ProxyView
-                        classes={this.props.classes}
-                        {...this.state.proxy}
-                        expanded={this.state.expanded}
+                }
+            });
+            setDirty(new Set(dirty).add('proxy'));
+        } else {
+            setState({
+                ...state,
+                headers: Object.entries(state.headers).reduce(
+                    (t, [k, v]) =>
+                        key === k ? t : Object.assign(t, { [k]: v }),
+                    {}
+                )
+            });
+            setDirty(new Set(dirty).add('headers'));
+        }
+    };
+
+    return (
+        <AccordionPanel onChange={(e, expanded) => setExpanded(expanded)}>
+            <AccordionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography
+                    variant="subtitle1"
+                    className={classes.flex}
+                >{`${data.method.toUpperCase()} ${data.path}`}</Typography>
+                {state.proxy ? <PublicIcon color="primary" /> : null}
+            </AccordionPanelSummary>
+            {edit ? (
+                state.proxy ? (
+                    <ProxyEdit
+                        classes={classes}
+                        {...state.proxy}
+                        expanded={expanded}
                         transition={transition}
-                        headersExpanded={this.state.headersExpanded}
-                        deleteHandler={this.handleDelete.bind(this)}
-                        editHandler={this.handleEdit.bind(this)}
-                        toggleHeadersHandler={this.handleToggleHeaders.bind(
-                            this
-                        )}
+                        changeHandler={handleChange}
+                        updateHandler={handleUpdate}
+                        cancelHandler={handleCancel}
+                        headerChangeHandler={handleHeaderChange}
+                        deleteHeaderHandler={handleDeleteHeader}
                     />
                 ) : (
-                    <View
-                        classes={this.props.classes}
-                        {...this.state}
-                        expanded={this.state.expanded}
+                    <Edit
+                        classes={classes}
+                        template={template}
+                        {...state}
+                        expanded={expanded}
                         transition={transition}
-                        headersExpanded={this.state.headersExpanded}
-                        bodyExpanded={this.state.bodyExpanded}
-                        deleteHandler={this.handleDelete.bind(this)}
-                        editHandler={this.handleEdit.bind(this)}
-                        toggleHeadersHandler={this.handleToggleHeaders.bind(
-                            this
-                        )}
-                        toggleBodyHandler={this.handleToggleBody.bind(this)}
+                        changeHandler={handleChange}
+                        updateHandler={handleUpdate}
+                        cancelHandler={handleCancel}
+                        headerChangeHandler={handleHeaderChange}
+                        deleteHeaderHandler={handleDeleteHeader}
                     />
-                )}
-            </AccordionPanel>
-        );
-    }
-
-    handleToggleHeaders() {
-        this.setState(state => ({ headersExpanded: !state.headersExpanded }));
-    }
-
-    handleToggleBody() {
-        this.setState(state => ({ bodyExpanded: !state.bodyExpanded }));
-    }
-
-    handleEdit() {
-        this.setState({ edit: true });
-    }
-
-    handleChange(key, value) {
-        this.setState(
-            state =>
-                state.proxy
-                    ? {
-                        proxy: Object.assign({}, state.proxy, {
-                            [key]: value
-                        }),
-                        dirty: new Set(state.dirty).add('proxy')
-                    }
-                    : {
-                        [key]: value,
-                        dirty: new Set(state.dirty).add(key)
-                    }
-        );
-    }
-
-    handleCancel() {
-        this.setState(Object.assign({}, this.props.data, { edit: false }));
-    }
-
-    async handleUpdate() {
-        await this.props.updateHandler(
-            this.state,
-            Array.from(this.state.dirty)
-        );
-        this.setState({ edit: false });
-    }
-
-    handleDelete() {
-        this.props.deleteHandler();
-    }
-
-    handleHeaderChange(key, value) {
-        this.setState(
-            state =>
-                state.proxy
-                    ? {
-                        proxy: Object.assign({}, state.proxy, {
-                            headers: Object.assign({}, state.proxy.headers, {
-                                [key]: value
-                            })
-                        }),
-                        dirty: new Set(state.dirty).add('proxy')
-                    }
-                    : {
-                        headers: Object.assign({}, state.headers, {
-                            [key]: value
-                        }),
-                        dirty: new Set(state.dirty).add('headers')
-                    }
-        );
-    }
-
-    handleDeleteHeader(key) {
-        this.setState(
-            state =>
-                state.proxy
-                    ? {
-                        proxy: Object.assign({}, state.proxy, {
-                            headers: Object.entries(
-                                state.proxy.headers
-                            ).reduce(
-                                (t, [k, v]) =>
-                                    key === k
-                                        ? t
-                                        : Object.assign(t, { [k]: v }),
-                                {}
-                            )
-                        }),
-                        dirty: new Set(state.dirty).add('proxy')
-                    }
-                    : {
-                        headers: Object.entries(state.headers).reduce(
-                            (t, [k, v]) =>
-                                key === k ? t : Object.assign(t, { [k]: v }),
-                            {}
-                        ),
-                        dirty: new Set(state.dirty).add('headers')
-                    }
-        );
-    }
-
-    handleNewHeaderChange(key, value) {
-        this.setState(state => ({
-            newHeader: Object.assign({}, state.newHeader, {
-                [key]: value
-            })
-        }));
-    }
-
-    handleAddNewHeader() {
-        this.setState(
-            state =>
-                state.proxy
-                    ? {
-                        proxy: Object.assign({}, state.proxy, {
-                            headers: Object.assign({}, state.proxy.headers, {
-                                [state.newHeader.key]: state.newHeader.value
-                            })
-                        }),
-                        newHeader: { key: '', value: '' },
-                        dirty: new Set(state.dirty).add('proxy')
-                    }
-                    : {
-                        headers: Object.assign({}, state.headers, {
-                            [state.newHeader.key]: state.newHeader.value
-                        }),
-                        newHeader: { key: '', value: '' },
-                        dirty: new Set(state.dirty).add('headers')
-                    }
-        );
-    }
-
-}
+                )
+            ) : state.proxy ? (
+                <ProxyView
+                    classes={classes}
+                    {...state.proxy}
+                    expanded={expanded}
+                    transition={transition}
+                    deleteHandler={handleDelete}
+                    editHandler={handleEdit}
+                />
+            ) : (
+                <View
+                    classes={classes}
+                    {...state}
+                    expanded={expanded}
+                    transition={transition}
+                    deleteHandler={handleDelete}
+                    editHandler={handleEdit}
+                />
+            )}
+        </AccordionPanel>
+    );
+};
 
 export default withStyles(styles)(Route);

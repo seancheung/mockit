@@ -20,7 +20,13 @@ module.exports = mode => ({
                 use: [
                     {
                         loader: 'babel-loader',
-                        options: { presets: ['@babel/preset-env', '@babel/preset-react'] }
+                        options: {
+                            presets: [
+                                '@babel/preset-env',
+                                '@babel/preset-react'
+                            ],
+                            cacheDirectory: true
+                        }
                     }
                 ]
             },
@@ -59,22 +65,24 @@ module.exports = mode => ({
         ...(mode !== 'production'
             ? []
             : [
-                new CleanWebpackPlugin(['www/*'], {
-                    root: path.resolve(__dirname, '../'),
-                    exclude: ['.gitignore']
-                }),
-                new UglifyJsPlugin({
-                    parallel: true,
-                    extractComments: true
-                })
-            ])
+                  new CleanWebpackPlugin(['www/*'], {
+                      root: path.resolve(__dirname, '../'),
+                      exclude: ['.gitignore']
+                  }),
+                  new UglifyJsPlugin({
+                      parallel: true,
+                      extractComments: true
+                  })
+              ])
     ],
     devServer: {
         contentBase: path.resolve(__dirname, '../www'),
-        after: function(app) {
+        after: function (app) {
             const mockit = require('mockit-express');
             const db = new mockit.Database();
-            const yaml = require('fs').readFileSync(path.resolve(__dirname, '../template.yml'));
+            const yaml = require('fs').readFileSync(
+                path.resolve(__dirname, '../template.yml')
+            );
             const template = require('js-yaml').safeLoad(yaml);
             const bodyParser = require('body-parser');
             require('../src/dashboard')(app, { template }, db, router => {
